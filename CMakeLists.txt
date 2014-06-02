@@ -8,7 +8,9 @@ set(VERSION_MINOR 7)
 set(VERSION_PATCH 0)
 set(VERSION_ABI 2)
 set(LAST_RELEASE 1.7.0)
+
 set(GITTARGETS_RELEASE_BRANCH minor)
+set(DPUT_HOST "ppa:eilemann/equalizer-dev")
 
 option(VMMLIB_USE_BLAS "Disable to turn blas detection off" ON)
 mark_as_advanced(VMMLIB_USE_BLAS)
