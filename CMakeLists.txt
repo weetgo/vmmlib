@@ -9,15 +9,16 @@ set(VERSION_MINOR 8)
 set(VERSION_PATCH 0)
 set(VERSION_ABI 3)
 
+set(COMMON_PROJECT_DOMAIN ch.eyescale)
+set(DPUT_HOST "ppa:eilemann/equalizer-dev")
+
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
                               ${CMAKE_SOURCE_DIR}/CMake/common)
 include(GitExternal)
 include(Common)
-include(FindPackages)
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-shadow -Wno-sign-compare -Wno-extra -Wno-strict-aliasing")
-endif()
+common_package(Boost COMPONENTS unit_test_framework)
+common_package_post()
 
 set(DOCS README.md AUTHORS LICENSE.txt ACKNOWLEDGEMENTS)
 
