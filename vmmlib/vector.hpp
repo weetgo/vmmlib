@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014, Visualization and Multimedia Lab,
+ * Copyright (c) 2006-2015, Visualization and Multimedia Lab,
  *                          University of Zurich <http://vmml.ifi.uzh.ch>,
  *                          Eyescale Software GmbH,
  *                          Blue Brain Project, EPFL
@@ -257,14 +257,12 @@ public:
     // retval = normal of (this), v1, v2
     vector compute_normal( const vector& v1, const vector& v2 ) const;
 
-    template< size_t N >
-    void get_sub_vector( vector< N, T >& sub_v_, size_t offset = 0,
-                         typename enable_if< M >= N >::type* = 0 );
-
+    /** @return the sub vector at the given position and length. */
     template< size_t N >
     vector< N, T >& get_sub_vector( size_t offset = 0,
         typename enable_if< M >= N >::type* = 0 );
 
+    /** @return the sub vector at the given position and length. */
     template< size_t N >
     const vector< N, T >& get_sub_vector( size_t offset = 0,
         typename enable_if< M >= N >::type* = 0 ) const;
@@ -1251,35 +1249,17 @@ distance_to_sphere( const vector< 3, TT >& point,
     return ( point - center_ ).length() - w();
 }
 
-template< size_t M, typename T >
-template< size_t N >
-void
-vector< M, T >::get_sub_vector( vector< N, T >& sub_v, size_t offset,
-                               typename enable_if< M >= N >::type* )
-{
-    assert( offset <= M - N );
-    sub_v = reinterpret_cast< vector< N, T >& >( *( begin() + offset ) );
-}
-
-
-
-template< size_t M, typename T >
-template< size_t N >
-inline vector< N, T >&
-vector< M, T >::get_sub_vector( size_t offset,
-    typename enable_if< M >= N >::type* )
+template< size_t M, typename T > template< size_t N > inline
+vector< N, T >& vector< M, T >::get_sub_vector( size_t offset,
+                                           typename enable_if< M >= N >::type* )
 {
     assert( offset <= M - N );
     return reinterpret_cast< vector< N, T >& >( *( begin() + offset ) );
 }
 
-
-
-template< size_t M, typename T >
-template< size_t N >
-inline const vector< N, T >&
-vector< M, T >::get_sub_vector( size_t offset,
-    typename enable_if< M >= N >::type* ) const
+template< size_t M, typename T > template< size_t N > inline
+const vector< N, T >& vector< M, T >::get_sub_vector( size_t offset,
+                                     typename enable_if< M >= N >::type* ) const
 {
     assert( offset <= M - N );
     return reinterpret_cast< const vector< N, T >& >( *( begin() + offset ) );
