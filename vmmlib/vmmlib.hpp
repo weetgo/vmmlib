@@ -36,14 +36,6 @@
 #ifndef __VMML__VMMLIB__HPP__
 #define __VMML__VMMLIB__HPP__
 
-#include <vmmlib/aabb.hpp>
-#include <vmmlib/frustum.hpp>
-#include <vmmlib/frustum_culler.hpp>
-#include <vmmlib/intersection.hpp>
-#include <vmmlib/lowpass_filter.hpp>
-#include <vmmlib/matrix.hpp>
-#include <vmmlib/quaternion.hpp>
-#include <vmmlib/vector.hpp>
-#include <vmmlib/version.hpp>
+#include <vmmlib/vmmlib.h>
 
 #endif
