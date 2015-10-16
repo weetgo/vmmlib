@@ -1,5 +1,5 @@
 # Copyright (c) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>
-#               2011-2014 Stefan.Eilemann@epfl.ch
+#               2011-2015 Stefan.Eilemann@epfl.ch
 
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 project(vmmlib)
@@ -10,6 +10,9 @@ set(VERSION_PATCH 0)
 set(VERSION_ABI 3)
 
 set(COMMON_PROJECT_DOMAIN ch.eyescale)
+set(VMMLIB_DESCRIPTION "Templatized C++ vector and matrix math library")
+set(VMMLIB_MAINTAINER "Stefan Eilemann <eile@eyescale.ch>")
+set(VMMLIB_LICENSE LPGL)
 set(DPUT_HOST "ppa:eilemann/equalizer-dev")
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
