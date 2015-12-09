@@ -38,13 +38,14 @@
 #include <vmmlib/enable_if.hpp>
 #include <vmmlib/exception.hpp>
 
-#include <iostream>
-#include <iomanip>
-#include <vector>
-#include <string>
-#include <cstring>
-#include <limits>
 #include <algorithm>
+#include <cstring>
+#include <iomanip>
+#include <iostream>
+#include <limits>
+#include <stdint.h>
+#include <string>
+#include <vector>
 
 namespace vmml
 {
