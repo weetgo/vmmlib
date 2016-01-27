@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2014-2015, Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2014-2016, Stefan.Eilemann@epfl.ch
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,7 +34,7 @@
 
 using namespace vmml;
 
-BOOST_AUTO_TEST_CASE(vector_base)
+BOOST_AUTO_TEST_CASE(base)
 {
     vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(vector_base)
     }
 }
 
-BOOST_AUTO_TEST_CASE(vector_plus)
+BOOST_AUTO_TEST_CASE(plus)
 {
     vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(vector_plus)
     }
 }
 
-BOOST_AUTO_TEST_CASE(vector_minus)
+BOOST_AUTO_TEST_CASE(minus)
 {
     vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(vector_minus)
     }
 }
 
-BOOST_AUTO_TEST_CASE(vector_times)
+BOOST_AUTO_TEST_CASE(times)
 {
     vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_CASE(vector_times)
     }
 }
 
-BOOST_AUTO_TEST_CASE(vector_div)
+BOOST_AUTO_TEST_CASE(divide)
 {
     vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
@@ -223,7 +223,7 @@ BOOST_AUTO_TEST_CASE(vector_div)
     }
 }
 
-BOOST_AUTO_TEST_CASE(vector_norm)
+BOOST_AUTO_TEST_CASE(vec_norm)
 {
     vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
@@ -314,7 +314,7 @@ BOOST_AUTO_TEST_CASE(vector_norm)
     BOOST_CHECK( vd.x() == 1 && vd.y() == 2 && vd.z() == 3 && vd.w() == 4 );
 }
 
-BOOST_AUTO_TEST_CASE(vector_dot)
+BOOST_AUTO_TEST_CASE(dotprod)
 {
     // dot product
     vector< 3, float > v0( 1, 2, 3 );
@@ -322,7 +322,7 @@ BOOST_AUTO_TEST_CASE(vector_dot)
     BOOST_CHECK( v0.dot( v1 ) == -8 );
 }
 
-BOOST_AUTO_TEST_CASE(vector_cross)
+BOOST_AUTO_TEST_CASE(crossprod)
 {
     // cross product
     vector< 3, float > v0( 1, 2, 3 );
@@ -352,7 +352,7 @@ BOOST_AUTO_TEST_CASE(vector_cross)
     BOOST_CHECK( index == 1 && ui == 5 );
 }
 
-BOOST_AUTO_TEST_CASE(vector_product)
+BOOST_AUTO_TEST_CASE(product)
 {
     const vector< 3, float > v0( 1, 2, 3 );
     BOOST_CHECK_EQUAL( v0.product(), 6 );
@@ -361,7 +361,7 @@ BOOST_AUTO_TEST_CASE(vector_product)
     BOOST_CHECK_EQUAL( v1.product(), 120 );
 }
 
-BOOST_AUTO_TEST_CASE(vector_tbd1)
+BOOST_AUTO_TEST_CASE(tbd1)
 {
     vector< 4, float > v1( -1.0f, 3.0f, -99.0f, -0.9f );
     float f = 4.0f;
@@ -386,7 +386,7 @@ BOOST_AUTO_TEST_CASE(vector_tbd1)
     }
 }
 
-BOOST_AUTO_TEST_CASE(vector_tbd2)
+BOOST_AUTO_TEST_CASE(tbd2)
 {
     // ???
     vector< 4, float > vf( 3.0, 2.0, 1.0, 1.0 );
@@ -409,11 +409,18 @@ BOOST_AUTO_TEST_CASE(vector_tbd2)
     BOOST_CHECK(vr == vr_check);
 }
 
-BOOST_AUTO_TEST_CASE(vector_l2norm)
+BOOST_AUTO_TEST_CASE(l2norm)
 {
     vector< 4, float > vr( 9.0, 4.0, 1.0, 2.0 );
     double v_norm_check = 10.09950493836208;
     double v_norm = vr.norm();
 
     BOOST_CHECK((v_norm - v_norm_check) < 0.0001);
+}
+
+BOOST_AUTO_TEST_CASE(rotate)
+{
+    vmml::Vector3f vector = vmml::Vector3f::FORWARD;
+    vector.rotate( M_PI, vmml::Vector3f::UP );
+    BOOST_CHECK_MESSAGE( vector.equals( vmml::Vector3f::BACKWARD ), vector );
 }
