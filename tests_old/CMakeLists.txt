@@ -14,7 +14,6 @@ set(TESTS
   unit_test.cpp
   unit_test_globals.cpp
   lowpass_filter_test.cpp
-  vector_test.cpp
   util_test.cpp
   vmmlib_unit_tests_main.cpp)
 

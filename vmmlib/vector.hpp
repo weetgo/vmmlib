@@ -244,12 +244,6 @@ public:
     vector< M, T >& rotate( T theta, vector< M, TT > axis,
                             typename enable_if< M == 3, TT >::type* = 0 );
 
-    // right hand system, CCW triangle
-    // (*this) = normal of v0,v1,v2
-    void compute_normal( const vector& v0, const vector& v1, const vector& v2 );
-    // retval = normal of (this), v1, v2
-    vector compute_normal( const vector& v1, const vector& v2 ) const;
-
     /** @return the sub vector at the given position and length. */
     template< size_t N >
     vector< N, T >& get_sub_vector( size_t offset = 0,
@@ -440,6 +434,18 @@ template< size_t M, typename T >
 inline vector< M, T > cross( vector< M, T > a, const vector< M, T >& b )
 {
     return a.cross( b );
+}
+
+template< size_t M, typename T >
+vector< M, T > compute_normal( const vector< M, T >& a, const vector< M, T >& b,
+                               const vector< M, T >& c )
+{
+    // right hand system, CCW triangle
+    const vector< M, T > u = b - a;
+    const vector< M, T > v = c - a;
+    vector< M, T > w = cross( u, v );
+    w.normalize();
+    return w;
 }
 
 template< size_t M, typename T >
@@ -1038,29 +1044,6 @@ template< size_t M, typename T > inline T vector< M, T >::product() const
     for( size_t i = 1; i < M; ++i )
         result *= at( i );
     return result;
-}
-
-template< size_t M, typename T >
-void vector< M, T >::compute_normal( const vector< M, T >& aa,
-                                     const vector< M, T >& bb,
-                                     const vector< M, T >& cc )
-{
-    vector< M, T > u,v;
-    // right hand system, CCW triangle
-    u = bb - aa;
-    v = cc - aa;
-    cross( u, v );
-    normalize();
-}
-
-template< size_t M, typename T >
-vector< M, T >
-vector< M, T >::compute_normal( const vector< M, T >& bb,
-                                const vector< M, T >& cc ) const
-{
-    vector< M, T > tmp;
-    tmp.compute_normal( *this, bb, cc);
-    return tmp;
 }
 
 template< size_t M, typename T > template< typename TT >

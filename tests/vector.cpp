@@ -324,13 +324,21 @@ BOOST_AUTO_TEST_CASE(dotprod)
 
 BOOST_AUTO_TEST_CASE(crossprod)
 {
-    // cross product
     vector< 3, float > v0( 1, 2, 3 );
     const vector< 3, float > v1( -6, 5, -4 );
     const vector< 3, float > vcorrect( -23, -14, 17 );
 
-    BOOST_CHECK( cross( v0, v1 ) == vcorrect );
-    BOOST_CHECK( v0.cross( v1 ) == vcorrect );
+    BOOST_CHECK_EQUAL( cross( v0, v1 ), vcorrect );
+    BOOST_CHECK_EQUAL( v0.cross( v1 ), vcorrect );
+}
+
+BOOST_AUTO_TEST_CASE(normal)
+{
+    const vmml::vector< 3, float > v1( 0.f, 0.f, 0.f );
+    const vmml::vector< 3, float > v2( 0.f, 1.f, 0.f );
+    const vmml::vector< 3, float > v3( 1.f, 0.f, 0.f );
+    const vmml::vector< 3, float > n( 0.f, 0.f, -1.f );
+    BOOST_CHECK_EQUAL( vmml::compute_normal( v1, v2, v3 ), n );
 }
 
 BOOST_AUTO_TEST_CASE(minMax)
