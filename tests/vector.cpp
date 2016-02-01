@@ -326,11 +326,15 @@ BOOST_AUTO_TEST_CASE(crossprod)
 {
     // cross product
     vector< 3, float > v0( 1, 2, 3 );
-    vector< 3, float > v1( -6, 5, -4 );
-    vector< 3, float > vcorrect( -23, -14, 17 );
-    BOOST_CHECK(v0.cross( v1 ) == vcorrect);
+    const vector< 3, float > v1( -6, 5, -4 );
+    const vector< 3, float > vcorrect( -23, -14, 17 );
 
-    // ???
+    BOOST_CHECK( cross( v0, v1 ) == vcorrect );
+    BOOST_CHECK( v0.cross( v1 ) == vcorrect );
+}
+
+BOOST_AUTO_TEST_CASE(minMax)
+{
     vector< 4, float > vf( -1.0f, 3.0f, -99.0f, -0.9f );
     vector< 4, size_t > vui( 0, 5, 2, 4 );
 

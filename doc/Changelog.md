@@ -5,7 +5,7 @@
 # Release 1.9 (02-11-2015) {#Release1_9}
 
 * [35](https://github.com/Eyescale/vmmlib/pull/35):
-  Fix Vector::rotate, add Matrix-from-iter-ctor
+  Fix Vector::rotate and cross, add Matrix-from-iter-ctor
 * [26](https://github.com/Eyescale/vmmlib/pull/26):
   Clean up Vector::get_sub_vector()
 * Fix AABB default ctor for unsigned values

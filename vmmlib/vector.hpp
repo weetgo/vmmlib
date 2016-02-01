@@ -210,16 +210,9 @@ public:
     // compute the cross product of two vectors
     // note: there's also a free function:
     // vector<> cross( const vector<>, const vector<> )
-
-    // result = vec1.cross( vec2 ) => retval result = vec1 x vec2
     template< typename TT >
-    vector cross( const vector< M, TT >& rhs,
-                  typename enable_if< M == 3, TT >::type* = 0 ) const;
-
-    // result.cross( vec1, vec2 ) => (this) = vec1 x vec2
-    template< typename TT >
-    void cross( const vector< M, TT >& a, const vector< M, TT >& b,
-                typename enable_if< M == 3, TT >::type* = 0 );
+    vector< M, T >& cross( const vector< M, TT >& b,
+                           typename enable_if< M == 3, TT >::type* = 0 );
 
     // compute the dot product of two vectors
     // note: there's also a free function:
@@ -248,8 +241,8 @@ public:
 
     /** Rotate this 3-component vector around the given axis. */
     template< typename TT >
-    void rotate( T theta, vector< M, TT > axis,
-                 typename enable_if< M == 3, TT >::type* = 0 );
+    vector< M, T >& rotate( T theta, vector< M, TT > axis,
+                            typename enable_if< M == 3, TT >::type* = 0 );
 
     // right hand system, CCW triangle
     // (*this) = normal of v0,v1,v2
@@ -444,7 +437,7 @@ inline T dot( const vector< M, T >& first, const vector< M, T >& second )
 }
 
 template< size_t M, typename T >
-inline vector< M, T > cross( const vector< 3, T >& a, const vector< 3, T >& b )
+inline vector< M, T > cross( vector< M, T > a, const vector< M, T >& b )
 {
     return a.cross( b );
 }
@@ -465,7 +458,7 @@ inline vector< 4, T > compute_plane( const vector< 3, T >& a,
     const vector< 3, T > cb = b - c;
     const vector< 3, T > ba = a - b;
 
-    vector< 4, T > plane = cb.cross( ba );
+    vector< 4, T > plane = vector< 4, T >( cross( cb, ba ));
     plane.normalize();
     plane.w() = -plane.x() * a.x() - plane.y() * a.y() - plane.z() * a.z();
     return plane;
@@ -972,27 +965,17 @@ vector< M, T >::a() const
     return array[ 3 ];
 }
 
-// result = vec1.cross( vec2 ) => result = vec1 x vec2
-template< size_t M, typename T >
-template< typename TT >
-inline vector< M, T > vector< M, T >::cross( const vector< M, TT >& rhs,
-                                 typename enable_if< M == 3, TT >::type* ) const
+template< size_t M, typename T > template< typename TT >
+vector< M, T >& vector< M, T >::cross( const vector< M, TT >& rhs,
+                                       typename enable_if< M == 3, TT >::type* )
 {
-    vector< M, T > result;
-    result.cross( *this, rhs );
-    return result;
-}
-
-// result.cross( vec1, vec2 ) => (this) = vec1 x vec2
-template< size_t M, typename T >
-template< typename TT >
-void vector< M, T >::cross( const vector< M, TT >& aa,
-                            const vector< M, TT >& bb,
-                            typename enable_if< M == 3, TT >::type* )
-{
-    array[ 0 ] = aa.y() * bb.z() - aa.z() * bb.y();
-    array[ 1 ] = aa.z() * bb.x() - aa.x() * bb.z();
-    array[ 2 ] = aa.x() * bb.y() - aa.y() * bb.x();
+    const T x_ = y() * rhs.z() - z() * rhs.y();
+    const T y_ = z() * rhs.x() - x() * rhs.z();
+    const T z_ = x() * rhs.y() - y() * rhs.x();
+    x() = x_;
+    y() = y_;
+    z() = z_;
+    return *this;
 }
 
 template< size_t M, typename T >
@@ -1081,8 +1064,8 @@ vector< M, T >::compute_normal( const vector< M, T >& bb,
 }
 
 template< size_t M, typename T > template< typename TT >
-void vector< M, T >::rotate( const T theta, vector< M, TT > axis,
-                             typename enable_if< M == 3, TT >::type* )
+vector< M, T >& vector< M, T >::rotate( const T theta, vector< M, TT > axis,
+                                        typename enable_if< M == 3, TT >::type* )
 {
     const T costheta = std::cos( theta );
     const T sintheta = std::sin( theta );
@@ -1100,6 +1083,7 @@ void vector< M, T >::rotate( const T theta, vector< M, TT > axis,
         (( 1 - costheta ) * axis.x() * axis.z() - axis.y() * sintheta ) * x() +
         (( 1 - costheta ) * axis.y() * axis.z() + axis.x() * sintheta ) * y() +
         ( costheta + ( 1 - costheta ) * axis.z() * axis.z() ) * z();
+    return *this;
 }
 
 // sphere layout: center xyz, radius w
