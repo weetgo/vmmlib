@@ -430,9 +430,14 @@ BOOST_AUTO_TEST_CASE(l2norm)
     BOOST_CHECK((v_norm - v_norm_check) < 0.0001);
 }
 
-BOOST_AUTO_TEST_CASE(rotate)
+BOOST_AUTO_TEST_CASE(rotateVec)
 {
     vmml::Vector3f vector = vmml::Vector3f::FORWARD;
     vector.rotate( M_PI, vmml::Vector3f::UP );
     BOOST_CHECK_MESSAGE( vector.equals( vmml::Vector3f::BACKWARD ), vector );
+    BOOST_CHECK_MESSAGE( vmml::rotate( vector, float( M_PI ),
+                                       vmml::Vector3f::LEFT ).equals(
+                                           vmml::Vector3f::FORWARD ),
+                         vmml::rotate( vector, float( M_PI ),
+                                       vmml::Vector3f::LEFT ));
 }

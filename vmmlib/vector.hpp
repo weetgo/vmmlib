@@ -448,6 +448,13 @@ vector< M, T > compute_normal( const vector< M, T >& a, const vector< M, T >& b,
     return w;
 }
 
+template< typename T >
+vector< 3, T > rotate( const vector< 3, T >& vec, T theta, vector< 3, T > axis )
+{
+    return vector< 3, T >( vec ).rotate( theta, axis );
+}
+
+
 template< size_t M, typename T >
 inline vector< M, T > normalize( const vector< M, T >& vector_ )
 {
