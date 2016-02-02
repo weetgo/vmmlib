@@ -291,10 +291,6 @@ public:
 
     void clamp( const T& min = 0.0, const T& max = 1.0 );
 
-    template< typename TT >
-    void scale_to( vector< M, TT >& scaled_vector,
-        T min_value = -1.0, T max_value = 1.0 ) const;
-
     inline static size_t size(); // returns M
 
     bool is_unit_vector() const;
@@ -1245,24 +1241,6 @@ void vector< M, T >::clamp( const T& min, const T& max )
         if( array[i] > max )
             array[i] = max;
     }
-}
-
-template< size_t M, typename T >
-template< typename TT >
-void
-vector< M, T >::scale_to( vector< M, TT >& result_,
-    T min_value, T max_value ) const
-{
-    T range       = max_value-min_value;
-    T half_range  = range * 0.5;
-    T scale       = ( 1.0 / range ) * static_cast< T >( std::numeric_limits< TT >::max() );
-
-    for( size_t index = 0; index < M; ++index )
-    {
-        result_.at( index )
-            = static_cast< TT >( ( at( index ) + half_range ) * scale );
-    }
-
 }
 
 template< size_t M, typename T >

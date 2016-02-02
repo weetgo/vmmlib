@@ -383,10 +383,9 @@ template< typename T > inline void
 AABB< T >::computeNearFar( const vector< 4, T >& plane, vector< 3, T >& nearPoint,
                            vector< 3, T >& farPoint ) const
 {
-    const vector< 3, T >& normal = plane.get_sub_vector< 3 >( 0 );
     for( size_t i = 0; i < 3; ++i )
     {
-        if( normal[ i ] >= 0.0 )
+        if( plane[ i ] >= 0.0 )
         {
             nearPoint[ i ] = _min[ i ];
             farPoint[ i ] = _max[ i ];
