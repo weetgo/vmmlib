@@ -398,16 +398,23 @@ BOOST_AUTO_TEST_CASE(tbd1)
     }
 }
 
-BOOST_AUTO_TEST_CASE(tbd2)
+BOOST_AUTO_TEST_CASE(subVector)
 {
-    // ???
-    vector< 4, float > vf( 3.0, 2.0, 1.0, 1.0 );
-    vector< 3, float >& v3 = vf.get_sub_vector< 3 >();
-    BOOST_CHECK(v3.x() == vf.x() && v3.y() == vf.y());
+    vector< 4, float > v4( 3.0, 2.0, 1.0, 1.0 );
+    vector< 3, float > v3 = v4.get_sub_vector< 3 >();
+    BOOST_CHECK(v3.x() == v4.x() && v3.y() == v4.y());
     v3.normalize();
 
-    BOOST_CHECK(v3.x() == vf.x() && v3.y() == vf.y());
+    BOOST_CHECK_NE( v3.x(), v4.x( ));
+    BOOST_CHECK_NE( v3.y(), v4.y( ));
 
+    v4.set_sub_vector< 3, 1 >( v3 );
+    BOOST_CHECK_EQUAL( v3.x(), v4.y( ));
+    BOOST_CHECK_EQUAL( v3.y(), v4.z( ));
+}
+
+BOOST_AUTO_TEST_CASE(tbd2)
+{
     //elementwise sqrt
     vector< 4, double > vsq(9.0, 4.0, 1.0, 2.0);
     vector< 4, double > vsq_check( 3.0, 2.0, 1.0, std::sqrt( 2.0 ));

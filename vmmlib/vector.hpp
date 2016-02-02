@@ -244,15 +244,15 @@ public:
     vector< M, T >& rotate( T theta, vector< M, TT > axis,
                             typename enable_if< M == 3, TT >::type* = 0 );
 
-    /** @return the sub vector at the given position and length. */
-    template< size_t N >
-    vector< N, T >& get_sub_vector( size_t offset = 0,
-        typename enable_if< M >= N >::type* = 0 );
+    /** @return the sub vector of the given length at the given offset. */
+    template< size_t N, size_t O = 0 >
+    vector< N, T > get_sub_vector( typename enable_if< M >= N+O >::type* = 0 )
+        const;
 
-    /** @return the sub vector at the given position and length. */
-    template< size_t N >
-    const vector< N, T >& get_sub_vector( size_t offset = 0,
-        typename enable_if< M >= N >::type* = 0 ) const;
+    /** Set the sub vector of the given length at the given offset. */
+    template< size_t N, size_t O = 0 >
+    void set_sub_vector( const vector< N, T >& sub,
+                         typename enable_if< M >= N+O >::type* = 0 );
 
     // sphere functions - sphere layout: center xyz, radius w
     template< typename TT >
@@ -1077,48 +1077,41 @@ vector< M, T >& vector< M, T >::rotate( const T theta, vector< M, TT > axis,
 }
 
 // sphere layout: center xyz, radius w
-template< size_t M, typename T >
-template< typename TT >
-inline vector< 3, T >
-vector< M, T >::
-project_point_onto_sphere( const vector< 3, TT >& point,
+template< size_t M, typename T > template< typename TT > inline vector< 3, T >
+vector< M, T >::project_point_onto_sphere( const vector< 3, TT >& point,
     typename enable_if< M == 4, TT >::type* ) const
 {
-    const vector< 3, T >& _center = get_sub_vector< 3 >( 0 );
+    const vector< 3, T >& center_ = get_sub_vector< 3 >();
 
     vector< 3, T > projected_point( point );
-    projected_point -= _center;
+    projected_point -= center_;
     projected_point.normalize();
     projected_point *= w();
-    return _center + projected_point;
+    return center_ + projected_point;
 }
 
 // sphere layout: center xyz, radius w
-template< size_t M, typename T >
-template< typename TT >
-inline T
-vector< M, T >::
-distance_to_sphere( const vector< 3, TT >& point,
-    typename enable_if< M == 4, TT >::type* ) const
+template< size_t M, typename T > template< typename TT > inline T
+vector< M, T >::distance_to_sphere( const vector< 3, TT >& point,
+                                    typename enable_if< M == 4, TT >::type* )
+    const
 {
-    const vector< 3, T >& center_ = get_sub_vector< 3 >( 0 );
+    const vector< 3, T >& center_ = get_sub_vector< 3 >();
     return ( point - center_ ).length() - w();
 }
 
-template< size_t M, typename T > template< size_t N > inline
-vector< N, T >& vector< M, T >::get_sub_vector( size_t offset,
-                                           typename enable_if< M >= N >::type* )
+template< size_t M, typename T > template< size_t N, size_t O >
+vector< N, T > vector< M, T >::get_sub_vector(
+    typename enable_if< M >= N+O >::type* ) const
 {
-    assert( offset <= M - N );
-    return reinterpret_cast< vector< N, T >& >( *( begin() + offset ) );
+    return vector< N, T >( array + O );
 }
 
-template< size_t M, typename T > template< size_t N > inline
-const vector< N, T >& vector< M, T >::get_sub_vector( size_t offset,
-                                     typename enable_if< M >= N >::type* ) const
+template< size_t M, typename T > template< size_t N, size_t O >
+void vector< M, T >::set_sub_vector( const vector< N, T >& sub,
+                                     typename enable_if< M >= N+O >::type* )
 {
-    assert( offset <= M - N );
-    return reinterpret_cast< const vector< N, T >& >( *( begin() + offset ) );
+    ::memcpy( array + O, sub.array, N * sizeof( T ));
 }
 
 // plane: normal xyz, distance w
@@ -1126,18 +1119,16 @@ template< size_t M, typename T > template< typename TT >
 inline T vector< M, T >::distance_to_plane( const vector< 3, TT >& point,
     typename enable_if< M == 4, TT >::type* ) const
 {
-    const vector< 3, T >& normal = get_sub_vector< 3 >( 0 );
+    const vector< 3, T >& normal = get_sub_vector< 3 >();
     return normal.dot( point ) + w();
 }
 
 // plane: normal xyz, distance w
-template< size_t M, typename T >
-template< typename TT >
-vector< 3, T >
+template< size_t M, typename T > template< typename TT > vector< 3, T >
 vector< M, T >::project_point_onto_plane( const vector< 3, TT >& point,
     typename enable_if< M == 4, TT >::type* ) const
 {
-    const vector< 3, T >& normal = get_sub_vector< 3 >( 0 );
+    const vector< 3, T >& normal = get_sub_vector< 3 >();
     return point - ( normal * distance_to_plane( point ) );
 }
 
