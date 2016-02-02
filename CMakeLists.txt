@@ -1,13 +1,13 @@
-# Copyright (c) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>
-#               2011-2015 Stefan.Eilemann@epfl.ch
+# Copyright (c) 2011-2016 Daniel Pfeifer <daniel@pfeifer-mail.de>
+#                         Stefan.Eilemann@epfl.ch
 
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 project(vmmlib)
 
 set(VERSION_MAJOR 1)
-set(VERSION_MINOR 9)
+set(VERSION_MINOR 10)
 set(VERSION_PATCH 0)
-set(VERSION_ABI 4)
+set(VERSION_ABI 5)
 
 set(COMMON_PROJECT_DOMAIN ch.eyescale)
 set(VMMLIB_DESCRIPTION "Templatized C++ vector and matrix math library")
@@ -22,7 +22,6 @@ include(Common)
 
 common_package(Boost COMPONENTS unit_test_framework)
 common_package_post()
-
 
 add_subdirectory(vmmlib)
 add_subdirectory(tests)
