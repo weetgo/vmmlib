@@ -481,7 +481,7 @@ bool matrix_test::run()
 
 	ok = true;
 	{
-		matrix< 3, 2 > m;
+		matrix< 3, 2, float > m;
 		try
 		{
 			m.at( 3, 2 );
@@ -600,7 +600,7 @@ bool matrix_test::run()
     // matrix inversion for 3x3
     {
         ok = true;
-        matrix< 3, 3 > M, M_inverse, M_inverse_correct;
+        matrix< 3, 3, float > M, M_inverse, M_inverse_correct;
         double Mdata[] = { 8, 1, 6, 3, 5, 7, 4, 9, 2 };
         M.set( Mdata, Mdata + 9 );
 

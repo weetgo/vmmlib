@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014, Visualization and Multimedia Lab,
+ * Copyright (c) 2006-2016, Visualization and Multimedia Lab,
  *                          University of Zurich <http://vmml.ifi.uzh.ch>,
  *                          Eyescale Software GmbH,
  *                          Blue Brain Project, EPFL
@@ -93,6 +93,13 @@ public:
     vector< 3, T > getCenter() const;
     vector< 3, T > getDimension() const;
 
+    /**
+     * Compute the nearest and furthest point of this box relative to the given
+     * plane.
+     */
+    void computeNearFar( const vector< 4, T >& plane, vector< 3, T >& nearPoint,
+                         vector< 3, T >& farPoint ) const;
+
     static AABB< T > makeUnitBox();
 
 protected:
@@ -153,7 +160,7 @@ AABB< T >::AABB( T cx, T cy, T cz, T size )
 template< typename T >
 inline bool AABB< T >::isIn( const vector< 4, T >& sphere )
 {
-    vector< 3, T > sv ( sphere.getCenter() );
+    const vector< 3, T >& sv = sphere.getCenter();
     sv += sphere.getRadius();
     if ( sv.x() > _max.x() || sv.y() > _max.y() || sv.z() > _max.z() )
         return false;
@@ -360,22 +367,38 @@ void AABB< T >::merge( const vector< 3, T >& point )
         _max.z() = point.z();
 }
 
-template< typename T >inline
+template< typename T > inline
 void AABB< T >::setEmpty()
 {
     _min = std::numeric_limits< T >::max();
     _max = -std::numeric_limits< T >::max();
 }
 
-
 template< typename T > inline bool AABB< T >::isEmpty() const
 {
-    return ( _min.x() >=  _max.x() || _min.y() >=  _max.y() ||
-             _min.z() >=  _max.x( ));
+    return _min.x() >= _max.x() || _min.y() >= _max.y() || _min.z() >= _max.x();
 }
 
-template< typename T >
-AABB< T > AABB< T >::makeUnitBox()
+template< typename T > inline void
+AABB< T >::computeNearFar( const vector< 4, T >& plane, vector< 3, T >& nearPoint,
+                           vector< 3, T >& farPoint ) const
+{
+    for( size_t i = 0; i < 3; ++i )
+    {
+        if( plane[ i ] >= 0.0 )
+        {
+            nearPoint[ i ] = _min[ i ];
+            farPoint[ i ] = _max[ i ];
+        }
+        else
+        {
+            nearPoint[ i ] = _max[ i ];
+            farPoint[ i ] = _min[ i ];
+        }
+    }
+}
+
+template< typename T > AABB< T > AABB< T >::makeUnitBox()
 {
     return AABB( vector< 3, T >::ZERO, vector< 3, T >::ONE );
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2015, Visualization and Multimedia Lab,
+ * Copyright (c) 2006-2016, Visualization and Multimedia Lab,
  *                          University of Zurich <http://vmml.ifi.uzh.ch>,
  *                          Eyescale Software GmbH,
  *                          Blue Brain Project, EPFL
@@ -47,9 +47,9 @@ template< class T >
 class frustum_culler
 {
 public:
-    typedef vector< 2, T >    vec2;
-    typedef vector< 3, T >    vec3;
-    typedef vector< 4, T >    vec4;
+    typedef vector< 2, T > vec2;
+    typedef vector< 3, T > vec3;
+    typedef vector< 4, T > vec4;
 
     // contructors
     frustum_culler() {}
@@ -69,29 +69,30 @@ public:
 
     Visibility test_sphere( const vec4& sphere ) const;
     Visibility test_aabb( const vec2& x, const vec2& y, const vec2& z ) const;
+    const vec4& getNearPlane() const { return _nearPlane; }
 
     friend std::ostream& operator << (std::ostream& os, const frustum_culler& f)
     {
         return os << "Frustum cull planes: " << std::endl
-                  << "    left   " << f._left_plane << std::endl
-                  << "    right  " << f._right_plane << std::endl
-                  << "    top    " << f._top_plane << std::endl
-                  << "    bottom " << f._bottom_plane << std::endl
-                  << "    near   " << f._near_plane << std::endl
-                  << "    far    " << f._far_plane << std::endl;
+                  << "    left   " << f._leftPlane << std::endl
+                  << "    right  " << f._rightPlane << std::endl
+                  << "    top    " << f._topPlane << std::endl
+                  << "    bottom " << f._bottomPlane << std::endl
+                  << "    near   " << f._nearPlane << std::endl
+                  << "    far    " << f._farPlane << std::endl;
     }
 
 private:
-    inline void _normalize_plane( vec4& plane ) const;
+    inline void _normalizePlane( vec4& plane ) const;
     inline Visibility _test_aabb( const vec4& plane, const vec3& middle,
                                   const vec3& size_2 ) const;
 
-    vec4    _left_plane;
-    vec4    _right_plane;
-    vec4    _bottom_plane;
-    vec4    _top_plane;
-    vec4    _near_plane;
-    vec4    _far_plane;
+    vec4    _leftPlane;
+    vec4    _rightPlane;
+    vec4    _bottomPlane;
+    vec4    _topPlane;
+    vec4    _nearPlane;
+    vec4    _farPlane;
 
 }; // class frustum_culler
 
@@ -125,19 +126,19 @@ void frustum_culler< T >::setup( const matrix< 4, 4, T >& proj_modelview )
     const vec4& row2 = proj_modelview.get_row( 2 );
     const vec4& row3 = proj_modelview.get_row( 3 );
 
-    _left_plane   = row3 + row0;
-    _right_plane  = row3 - row0;
-    _bottom_plane = row3 + row1;
-    _top_plane    = row3 - row1;
-    _near_plane   = row3 + row2;
-    _far_plane    = row3 - row2;
+    _leftPlane   = row3 + row0;
+    _rightPlane  = row3 - row0;
+    _bottomPlane = row3 + row1;
+    _topPlane    = row3 - row1;
+    _nearPlane   = row3 + row2;
+    _farPlane    = row3 - row2;
 
-    _normalize_plane( _left_plane );
-    _normalize_plane( _right_plane );
-    _normalize_plane( _bottom_plane );
-    _normalize_plane( _top_plane );
-    _normalize_plane( _near_plane );
-    _normalize_plane( _far_plane );
+    _normalizePlane( _leftPlane );
+    _normalizePlane( _rightPlane );
+    _normalizePlane( _bottomPlane );
+    _normalizePlane( _topPlane );
+    _normalizePlane( _nearPlane );
+    _normalizePlane( _farPlane );
 }
 
 template < class T >
@@ -152,17 +153,17 @@ void frustum_culler< T >::setup( const vec3& a, const vec3& b,
     // | c d |/h
     //  -----
     // CCW winding
-    _left_plane   = compute_plane( c, a, e );
-    _right_plane  = compute_plane( f, b, d );
-    _bottom_plane = compute_plane( h, d, c );
-    _top_plane    = compute_plane( a, b, f );
-    _near_plane   = compute_plane( b, a, c );
-    _far_plane    = compute_plane( g, e, f );
+    _leftPlane   = compute_plane( c, a, e );
+    _rightPlane  = compute_plane( f, b, d );
+    _bottomPlane = compute_plane( h, d, c );
+    _topPlane    = compute_plane( a, b, f );
+    _nearPlane   = compute_plane( b, a, c );
+    _farPlane    = compute_plane( g, e, f );
 }
 
 template < class T >
 inline void
-frustum_culler< T >::_normalize_plane( vector< 4, T >& plane ) const
+frustum_culler< T >::_normalizePlane( vector< 4, T >& plane ) const
 {
     const vec3& v3 = plane.template get_sub_vector< 3 >();
     const T len_i = 1.0 / v3.length();
@@ -185,44 +186,44 @@ frustum_culler< T >::test_sphere( const vector< 4, T >& sphere ) const
     // - if sphere intersects one plane: partially visible
     // - else: fully visible
 
-    T distance = _left_plane.x() * sphere.x() + _left_plane.y() * sphere.y() +
-                 _left_plane.z() * sphere.z() + _left_plane.w();
+    T distance = _leftPlane.x() * sphere.x() + _leftPlane.y() * sphere.y() +
+                 _leftPlane.z() * sphere.z() + _leftPlane.w();
     if( distance <= -sphere.w() )
         return VISIBILITY_NONE;
     if( distance < sphere.w() )
         visibility = VISIBILITY_PARTIAL;
 
-    distance = _right_plane.x() * sphere.x() + _right_plane.y() * sphere.y() +
-               _right_plane.z() * sphere.z() + _right_plane.w();
+    distance = _rightPlane.x() * sphere.x() + _rightPlane.y() * sphere.y() +
+               _rightPlane.z() * sphere.z() + _rightPlane.w();
     if( distance <= -sphere.w() )
         return VISIBILITY_NONE;
     if( distance < sphere.w() )
         visibility = VISIBILITY_PARTIAL;
 
-    distance = _bottom_plane.x() * sphere.x() + _bottom_plane.y() * sphere.y() +
-               _bottom_plane.z() * sphere.z() + _bottom_plane.w();
+    distance = _bottomPlane.x() * sphere.x() + _bottomPlane.y() * sphere.y() +
+               _bottomPlane.z() * sphere.z() + _bottomPlane.w();
     if( distance <= -sphere.w() )
         return VISIBILITY_NONE;
     if( distance < sphere.w() )
         visibility = VISIBILITY_PARTIAL;
 
-    distance = _top_plane.x() * sphere.x() + _top_plane.y() * sphere.y() +
-               _top_plane.z() * sphere.z() + _top_plane.w();
+    distance = _topPlane.x() * sphere.x() + _topPlane.y() * sphere.y() +
+               _topPlane.z() * sphere.z() + _topPlane.w();
     if( distance <= -sphere.w() )
         return VISIBILITY_NONE;
     if( distance < sphere.w() )
         visibility = VISIBILITY_PARTIAL;
 
-    distance = _near_plane.x() * sphere.x() + _near_plane.y() * sphere.y() +
-               _near_plane.z() * sphere.z() + _near_plane.w();
+    distance = _nearPlane.x() * sphere.x() + _nearPlane.y() * sphere.y() +
+               _nearPlane.z() * sphere.z() + _nearPlane.w();
 
     if( distance <= -sphere.w() )
         return VISIBILITY_NONE;
     if( distance < sphere.w() )
         visibility = VISIBILITY_PARTIAL;
 
-    distance = _far_plane.x() * sphere.x() + _far_plane.y() * sphere.y() +
-               _far_plane.z() * sphere.z() + _far_plane.w();
+    distance = _farPlane.x() * sphere.x() + _farPlane.y() * sphere.y() +
+               _farPlane.z() * sphere.z() + _farPlane.w();
     if( distance <= -sphere.w() )
         return VISIBILITY_NONE;
     if( distance < sphere.w() )
@@ -257,42 +258,42 @@ Visibility frustum_culler< T >::test_aabb( const vec2& x, const vec2& y,
     const vec3& middle = vec3( x[0] + x[1], y[0] + y[1], z[0] + z[1] ) * .5;
     const vec3& extent = vec3( fabs(x[1] - x[0]), fabs(y[1] - y[0]),
                                fabs(z[1] - z[0]) ) * .5;
-    switch( _test_aabb( _left_plane, middle, extent ))
+    switch( _test_aabb( _leftPlane, middle, extent ))
     {
         case VISIBILITY_FULL: break;
         case VISIBILITY_PARTIAL: result = VISIBILITY_PARTIAL; break;
         case VISIBILITY_NONE: return VISIBILITY_NONE;
     }
 
-    switch( _test_aabb( _right_plane, middle, extent ))
+    switch( _test_aabb( _rightPlane, middle, extent ))
     {
         case VISIBILITY_FULL: break;
         case VISIBILITY_PARTIAL: result = VISIBILITY_PARTIAL; break;
         case VISIBILITY_NONE: return VISIBILITY_NONE;
     }
 
-    switch( _test_aabb( _bottom_plane, middle, extent ))
+    switch( _test_aabb( _bottomPlane, middle, extent ))
     {
         case VISIBILITY_FULL: break;
         case VISIBILITY_PARTIAL: result = VISIBILITY_PARTIAL; break;
         case VISIBILITY_NONE: return VISIBILITY_NONE;
     }
 
-    switch( _test_aabb( _top_plane, middle, extent ))
+    switch( _test_aabb( _topPlane, middle, extent ))
     {
         case VISIBILITY_FULL: break;
         case VISIBILITY_PARTIAL: result = VISIBILITY_PARTIAL; break;
         case VISIBILITY_NONE: return VISIBILITY_NONE;
     }
 
-    switch( _test_aabb( _near_plane, middle, extent ))
+    switch( _test_aabb( _nearPlane, middle, extent ))
     {
         case VISIBILITY_FULL: break;
         case VISIBILITY_PARTIAL: result = VISIBILITY_PARTIAL; break;
         case VISIBILITY_NONE: return VISIBILITY_NONE;
     }
 
-    switch( _test_aabb( _far_plane, middle, extent ))
+    switch( _test_aabb( _farPlane, middle, extent ))
     {
         case VISIBILITY_FULL: break;
         case VISIBILITY_PARTIAL: result = VISIBILITY_PARTIAL; break;

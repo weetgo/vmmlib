@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2014-2015, Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2014-2016, Stefan.Eilemann@epfl.ch
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,7 +34,7 @@
 
 using namespace vmml;
 
-BOOST_AUTO_TEST_CASE(vector_base)
+BOOST_AUTO_TEST_CASE(base)
 {
     vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(vector_base)
     }
 }
 
-BOOST_AUTO_TEST_CASE(vector_plus)
+BOOST_AUTO_TEST_CASE(plus)
 {
     vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(vector_plus)
     }
 }
 
-BOOST_AUTO_TEST_CASE(vector_minus)
+BOOST_AUTO_TEST_CASE(minus)
 {
     vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(vector_minus)
     }
 }
 
-BOOST_AUTO_TEST_CASE(vector_times)
+BOOST_AUTO_TEST_CASE(times)
 {
     vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_CASE(vector_times)
     }
 }
 
-BOOST_AUTO_TEST_CASE(vector_div)
+BOOST_AUTO_TEST_CASE(divide)
 {
     vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
@@ -223,7 +223,7 @@ BOOST_AUTO_TEST_CASE(vector_div)
     }
 }
 
-BOOST_AUTO_TEST_CASE(vector_norm)
+BOOST_AUTO_TEST_CASE(vec_norm)
 {
     vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
@@ -314,7 +314,7 @@ BOOST_AUTO_TEST_CASE(vector_norm)
     BOOST_CHECK( vd.x() == 1 && vd.y() == 2 && vd.z() == 3 && vd.w() == 4 );
 }
 
-BOOST_AUTO_TEST_CASE(vector_dot)
+BOOST_AUTO_TEST_CASE(dotprod)
 {
     // dot product
     vector< 3, float > v0( 1, 2, 3 );
@@ -322,15 +322,27 @@ BOOST_AUTO_TEST_CASE(vector_dot)
     BOOST_CHECK( v0.dot( v1 ) == -8 );
 }
 
-BOOST_AUTO_TEST_CASE(vector_cross)
+BOOST_AUTO_TEST_CASE(crossprod)
 {
-    // cross product
     vector< 3, float > v0( 1, 2, 3 );
-    vector< 3, float > v1( -6, 5, -4 );
-    vector< 3, float > vcorrect( -23, -14, 17 );
-    BOOST_CHECK(v0.cross( v1 ) == vcorrect);
+    const vector< 3, float > v1( -6, 5, -4 );
+    const vector< 3, float > vcorrect( -23, -14, 17 );
 
-    // ???
+    BOOST_CHECK_EQUAL( cross( v0, v1 ), vcorrect );
+    BOOST_CHECK_EQUAL( v0.cross( v1 ), vcorrect );
+}
+
+BOOST_AUTO_TEST_CASE(normal)
+{
+    const vmml::vector< 3, float > v1( 0.f, 0.f, 0.f );
+    const vmml::vector< 3, float > v2( 0.f, 1.f, 0.f );
+    const vmml::vector< 3, float > v3( 1.f, 0.f, 0.f );
+    const vmml::vector< 3, float > n( 0.f, 0.f, -1.f );
+    BOOST_CHECK_EQUAL( vmml::compute_normal( v1, v2, v3 ), n );
+}
+
+BOOST_AUTO_TEST_CASE(minMax)
+{
     vector< 4, float > vf( -1.0f, 3.0f, -99.0f, -0.9f );
     vector< 4, size_t > vui( 0, 5, 2, 4 );
 
@@ -352,7 +364,7 @@ BOOST_AUTO_TEST_CASE(vector_cross)
     BOOST_CHECK( index == 1 && ui == 5 );
 }
 
-BOOST_AUTO_TEST_CASE(vector_product)
+BOOST_AUTO_TEST_CASE(product)
 {
     const vector< 3, float > v0( 1, 2, 3 );
     BOOST_CHECK_EQUAL( v0.product(), 6 );
@@ -361,7 +373,7 @@ BOOST_AUTO_TEST_CASE(vector_product)
     BOOST_CHECK_EQUAL( v1.product(), 120 );
 }
 
-BOOST_AUTO_TEST_CASE(vector_tbd1)
+BOOST_AUTO_TEST_CASE(tbd1)
 {
     vector< 4, float > v1( -1.0f, 3.0f, -99.0f, -0.9f );
     float f = 4.0f;
@@ -386,16 +398,23 @@ BOOST_AUTO_TEST_CASE(vector_tbd1)
     }
 }
 
-BOOST_AUTO_TEST_CASE(vector_tbd2)
+BOOST_AUTO_TEST_CASE(subVector)
 {
-    // ???
-    vector< 4, float > vf( 3.0, 2.0, 1.0, 1.0 );
-    vector< 3, float >& v3 = vf.get_sub_vector< 3 >();
-    BOOST_CHECK(v3.x() == vf.x() && v3.y() == vf.y());
+    vector< 4, float > v4( 3.0, 2.0, 1.0, 1.0 );
+    vector< 3, float > v3 = v4.get_sub_vector< 3 >();
+    BOOST_CHECK(v3.x() == v4.x() && v3.y() == v4.y());
     v3.normalize();
 
-    BOOST_CHECK(v3.x() == vf.x() && v3.y() == vf.y());
+    BOOST_CHECK_NE( v3.x(), v4.x( ));
+    BOOST_CHECK_NE( v3.y(), v4.y( ));
 
+    v4.set_sub_vector< 3, 1 >( v3 );
+    BOOST_CHECK_EQUAL( v3.x(), v4.y( ));
+    BOOST_CHECK_EQUAL( v3.y(), v4.z( ));
+}
+
+BOOST_AUTO_TEST_CASE(tbd2)
+{
     //elementwise sqrt
     vector< 4, double > vsq(9.0, 4.0, 1.0, 2.0);
     vector< 4, double > vsq_check( 3.0, 2.0, 1.0, std::sqrt( 2.0 ));
@@ -409,11 +428,23 @@ BOOST_AUTO_TEST_CASE(vector_tbd2)
     BOOST_CHECK(vr == vr_check);
 }
 
-BOOST_AUTO_TEST_CASE(vector_l2norm)
+BOOST_AUTO_TEST_CASE(l2norm)
 {
     vector< 4, float > vr( 9.0, 4.0, 1.0, 2.0 );
     double v_norm_check = 10.09950493836208;
     double v_norm = vr.norm();
 
     BOOST_CHECK((v_norm - v_norm_check) < 0.0001);
+}
+
+BOOST_AUTO_TEST_CASE(rotateVec)
+{
+    vmml::Vector3f vector = vmml::Vector3f::FORWARD;
+    vector.rotate( M_PI, vmml::Vector3f::UP );
+    BOOST_CHECK_MESSAGE( vector.equals( vmml::Vector3f::BACKWARD ), vector );
+    BOOST_CHECK_MESSAGE( vmml::rotate( vector, float( M_PI ),
+                                       vmml::Vector3f::LEFT ).equals(
+                                           vmml::Vector3f::FORWARD ),
+                         vmml::rotate( vector, float( M_PI ),
+                                       vmml::Vector3f::LEFT ));
 }

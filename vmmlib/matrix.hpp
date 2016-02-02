@@ -54,7 +54,7 @@ namespace vmml
 {
 
 // matrix of type T with m rows and n columns
-template< size_t M, size_t N, typename T = float >
+template< size_t M, size_t N, typename T >
 class matrix
 {
 public:
@@ -67,8 +67,17 @@ public:
     static const size_t         ROWS = M;
     static const size_t         COLS = N;
 
-    // ctors
+    /**
+     * Construct a zero-initialized matrix.
+     * Square matrices are initialized as identity
+     */
     matrix();
+
+    /**
+     * Construct a matrix with default values.
+     * Missing data is zero-initialized.
+     */
+    matrix( const T* begin, const T* end );
 
     template< size_t P, size_t Q, typename U >
     matrix( const matrix< P, Q, U >& source_ );
@@ -816,6 +825,14 @@ matrix< M, N, T >::matrix()
     if( M == N )
         for( size_t i = 0; i < M; ++i )
             at( i, i ) = static_cast< T >( 1.0 );
+}
+
+template< size_t M, size_t N, typename T >
+matrix< M, N, T >::matrix( const T* begin_, const T* end_ )
+    : array() // http://stackoverflow.com/questions/5602030
+{
+    const T* to = std::min( end_, begin_ + M*N );
+    ::memcpy( array, begin_, (to - begin_) * sizeof( T ));
 }
 
 template< size_t M, size_t N, typename T >
