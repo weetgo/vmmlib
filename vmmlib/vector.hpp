@@ -239,9 +239,8 @@ public:
     /** @return the product of all elements of this vector */
     T product() const;
 
-    /** Rotate this 3-component vector around the given axis. */
     template< typename TT >
-    vector< M, T >& rotate( T theta, vector< M, TT > axis,
+    vector< 3, T >& rotate( const T theta, vector< M, TT > axis,
                             typename enable_if< M == 3, TT >::type* = 0 );
 
     /** @return the sub vector of the given length at the given offset. */
@@ -445,9 +444,9 @@ vector< M, T > compute_normal( const vector< M, T >& a, const vector< M, T >& b,
 }
 
 template< typename T >
-vector< 3, T > rotate( const vector< 3, T >& vec, T theta, vector< 3, T > axis )
+vector< 3, T > rotate( vector< 3, T > vec, T theta, vector< 3, T > axis )
 {
-    return vector< 3, T >( vec ).rotate( theta, axis );
+    return vec.rotate( theta, axis );
 }
 
 
@@ -1047,26 +1046,26 @@ template< size_t M, typename T > inline T vector< M, T >::product() const
 }
 
 template< size_t M, typename T > template< typename TT >
-vector< M, T >& vector< M, T >::rotate( const T theta, vector< M, TT > axis,
-                                        typename enable_if< M == 3, TT >::type* )
+vector< 3, T >& vector< M, T >::rotate( const T theta, vector< M, TT > axis,
+                                        typename enable_if< M==3, TT >::type* )
 {
-    const T costheta = std::cos( theta );
-    const T sintheta = std::sin( theta );
     axis.normalize();
 
-    array[0] =
+    const T costheta = std::cos( theta );
+    const T sintheta = std::sin( theta );
+
+    return *this = vector< 3, T >(
         (costheta + ( 1.0f - costheta ) * axis.x() * axis.x() ) * x()    +
         (( 1 - costheta ) * axis.x() * axis.y() - axis.z() * sintheta ) * y() +
-        (( 1 - costheta ) * axis.x() * axis.z() + axis.y() * sintheta ) * z();
-    array[1] =
+        (( 1 - costheta ) * axis.x() * axis.z() + axis.y() * sintheta ) * z(),
+
         (( 1 - costheta ) * axis.x() * axis.y() + axis.z() * sintheta ) * x() +
         ( costheta + ( 1 - costheta ) * axis.y() * axis.y() ) * y() +
-        (( 1 - costheta ) * axis.y() * axis.z() - axis.x() * sintheta ) * z();
-    array[2] =
+        (( 1 - costheta ) * axis.y() * axis.z() - axis.x() * sintheta ) * z(),
+
         (( 1 - costheta ) * axis.x() * axis.z() - axis.y() * sintheta ) * x() +
         (( 1 - costheta ) * axis.y() * axis.z() + axis.x() * sintheta ) * y() +
-        ( costheta + ( 1 - costheta ) * axis.z() * axis.z() ) * z();
-    return *this;
+        ( costheta + ( 1 - costheta ) * axis.z() * axis.z() ) * z( ));
 }
 
 // sphere layout: center xyz, radius w
