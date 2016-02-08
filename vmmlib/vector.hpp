@@ -452,11 +452,10 @@ vector< 3, T > rotate( const vector< 3, T >& vec, T theta, vector< 3, T > axis )
 
 
 template< size_t M, typename T >
-inline vector< M, T > normalize( const vector< M, T >& vector_ )
+inline vector< M, T > normalize( vector< M, T > vector_ )
 {
-    vector< M, T > v( vector_ );
-    v.normalize();
-    return v;
+    vector_.normalize();
+    return vector_;
 }
 
 template< typename T >
@@ -997,12 +996,10 @@ inline T vector< M, T >::dot( const vector< M, T >& other ) const
     return tmp;
 }
 
-template< size_t M, typename T >
-inline T vector< M, T >::normalize()
+template< size_t M, typename T > inline T vector< M, T >::normalize()
 {
     const T len = length();
-
-    if ( len == 0 )
+    if ( len <= std::numeric_limits< T >::epsilon( ))
         return 0;
 
     const T tmp = 1.0 / len;
