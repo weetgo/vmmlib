@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2015, Visualization and Multimedia Lab,
+ * Copyright (c) 2006-2016, Visualization and Multimedia Lab,
  *                          University of Zurich <http://vmml.ifi.uzh.ch>,
  *                          Eyescale Software GmbH,
  *                          Blue Brain Project, EPFL
@@ -240,7 +240,7 @@ public:
     T product() const;
 
     template< typename TT >
-    vector< 3, T >& rotate( const T theta, vector< M, TT > axis,
+    vector< 3, T >& rotate( T theta, vector< M, TT > axis,
                             typename enable_if< M == 3, TT >::type* = 0 );
 
     /** @return the sub vector of the given length at the given offset. */
@@ -444,7 +444,8 @@ vector< M, T > compute_normal( const vector< M, T >& a, const vector< M, T >& b,
 }
 
 template< typename T >
-vector< 3, T > rotate( vector< 3, T > vec, T theta, vector< 3, T > axis )
+vector< 3, T > rotate( vector< 3, T > vec, const T theta,
+                       const vector< 3, T >& axis )
 {
     return vec.rotate( theta, axis );
 }
@@ -1049,11 +1050,10 @@ template< size_t M, typename T > template< typename TT >
 vector< 3, T >& vector< M, T >::rotate( const T theta, vector< M, TT > axis,
                                         typename enable_if< M==3, TT >::type* )
 {
-    axis.normalize();
-
     const T costheta = std::cos( theta );
     const T sintheta = std::sin( theta );
 
+    axis.normalize();
     return *this = vector< 3, T >(
         (costheta + ( 1.0f - costheta ) * axis.x() * axis.x() ) * x()    +
         (( 1 - costheta ) * axis.x() * axis.y() - axis.z() * sintheta ) * y() +
