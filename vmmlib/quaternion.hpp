@@ -208,8 +208,8 @@ public:
 
 #ifndef VMMLIB_NO_TYPEDEFS
 
-typedef quaternion< float >  quaternionf;
-typedef quaternion< double > quaterniond;
+typedef quaternion< float >  Quaternionf;
+typedef quaternion< double > Quaterniond;
 
 #endif
 
