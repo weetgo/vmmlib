@@ -440,7 +440,7 @@ BOOST_AUTO_TEST_CASE(l2norm)
 BOOST_AUTO_TEST_CASE(rotateVec)
 {
     vmml::Vector3f vector = vmml::Vector3f::FORWARD;
-    vector.rotate( M_PI, vmml::Vector3f::UP );
+    vector.rotate( float( M_PI ), vmml::Vector3f::UP );
     BOOST_CHECK_MESSAGE( vector.equals( vmml::Vector3f::BACKWARD ), vector );
     BOOST_CHECK_MESSAGE( vmml::rotate( vector, float( M_PI ),
                                        vmml::Vector3f::LEFT ).equals(
