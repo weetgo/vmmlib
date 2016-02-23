@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2014, Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2014-2016, Stefan.Eilemann@epfl.ch
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -47,13 +47,13 @@ BOOST_AUTO_TEST_CASE(axisAlignedBoundingBox_base)
     BOOST_CHECK_EQUAL( box1.isEmpty(), false );
     BOOST_CHECK_EQUAL( box1.getMin(), p1 );
     BOOST_CHECK_EQUAL( box1.getMax(), p2 );
-    BOOST_CHECK_EQUAL( box1.getDimension(), p2 );
+    BOOST_CHECK_EQUAL( box1.getSize(), p2 );
 
     const vmml::AABBf box2( -p2, p2 );
     BOOST_CHECK_EQUAL( box2.isEmpty(), false );
     BOOST_CHECK_EQUAL( box2.getMin(), -p2 );
     BOOST_CHECK_EQUAL( box2.getMax(), p2 );
-    BOOST_CHECK_EQUAL( box2.getDimension(), vmml::Vector3f( 2.f, 2.f, 2.f ));
+    BOOST_CHECK_EQUAL( box2.getSize(), vmml::Vector3f( 2.f, 2.f, 2.f ));
 
     box1.merge( box2 );
     BOOST_CHECK_EQUAL( box1, box2 );
