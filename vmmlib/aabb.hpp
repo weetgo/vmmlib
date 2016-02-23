@@ -41,7 +41,7 @@ namespace vmml
  * An axis-aligned bounding box.
  *
  * An empty bounding box has undefined, implementation-specific values. Read
- * operations (getMin(), getMax(), getDimension(), isIn(), etc.) have undefined
+ * operations (getMin(), getMax(), getSize(), isIn(), etc.) have undefined
  * semantics on an empty bounding box. set() and merge() operations will define
  * the bounding box correctly.
  */
@@ -50,48 +50,50 @@ template< typename T > class AABB
 public:
     /** Create an empty bounding box. */
     AABB();
-    AABB( const vector< 3, T >& pMin,
-                            const vector< 3, T >& pMax );
-    AABB( const vector< 4, T >& sphere );
-    AABB( T cx, T cy, T cz, T size );
 
-    bool isIn( const vector< 3, T >& pos );
-    bool isIn2d( const vector< 3, T >& pos ); // only x and y components are checked
+    /** Create a new bounding box from two corner points */
+    AABB( const vector< 3, T >& pMin, const vector< 3, T >& pMax );
+
+    /** Create a new bounding box from a bounding sphere */
+    AABB( const vector< 4, T >& sphere );
+
+    /** @return true if the given point is within this bounding box. */
+    bool isIn( const vector< 3, T >& point );
+
+    /** @return true if the given sphere is within this bounding box. */
     bool isIn( const vector< 4, T >& sphere );
 
-    void set( const vector< 3, T >& pMin, const vector< 3, T >& pMax );
-    void set( T cx, T cy, T cz, T size );
-    void setMin( const vector< 3, T >& pMin );
-    void setMax( const vector< 3, T >& pMax );
-
+    /** @return the minimum corner point */
     const vector< 3, T >& getMin() const;
-    const vector< 3, T >& getMax() const;
     vector< 3, T >& getMin();
+
+    /** @return the maximum corner point */
+    const vector< 3, T >& getMax() const;
     vector< 3, T >& getMax();
 
+    /** Create the union of this and the given bounding box */
     void merge( const AABB< T >& aabb );
+
+    /** Create the union of this and the given point */
     void merge( const vector< 3, T >& point );
 
-    void setEmpty();
+    /** Clear this bounding box */
+    void reset();
+
+    /** @return true if this bounding box has not been set */
     bool isEmpty() const;
 
-    AABB operator*( const T value ) const;
-    AABB operator/( const T value ) const;
-    AABB operator+( const T value ) const;
-    AABB operator-( const T value ) const;
+    /** @return true if this and the other bounding box are identical */
+    bool operator==( const AABB< T >& other ) const;
 
-    void operator*=( const T value );
-    void operator/=( const T value );
-    void operator+=( const T value );
-    void operator-=( const T value );
+    /** @return true if this and the other bounding box are not identical */
+    bool operator!=( const AABB< T >& other ) const;
 
-    template< class U >
-    bool operator==( const AABB< U >& other ) const;
-    template< class U >
-    bool operator!=( const AABB< U >& other ) const;
-
+    /** @return the center of this bounding box */
     vector< 3, T > getCenter() const;
-    vector< 3, T > getDimension() const;
+
+    /** @return the size of this bounding box */
+    vector< 3, T > getSize() const;
 
     /**
      * Compute the nearest and furthest point of this box relative to the given
@@ -100,6 +102,7 @@ public:
     void computeNearFar( const vector< 4, T >& plane, vector< 3, T >& nearPoint,
                          vector< 3, T >& farPoint ) const;
 
+    /** @return a bouding box of size one with the minimum point at zero. */
     static AABB< T > makeUnitBox();
 
 protected:
@@ -107,14 +110,11 @@ protected:
     vector< 3, T > _max;
 };
 
-#ifndef VMMLIB_NO_TYPEDEFS
-typedef AABB< float >  AABBf;
-typedef AABB< double > AABBd;
-#endif
+typedef AABB< float >  AABBf; //!< A float bounding box
+typedef AABB< double > AABBd; //!< A double bounding box
 
-template< typename T >
-inline std::ostream& operator << ( std::ostream& os,
-                                   const AABB< T >& aabb )
+template< typename T > inline
+std::ostream& operator << ( std::ostream& os, const AABB< T >& aabb )
 {
     return os << aabb.getMin() << " - " << aabb.getMax();
 }
@@ -135,30 +135,30 @@ template<> inline AABB< double >::AABB()
 {}
 
 template< typename T >
-AABB< T >::AABB( const vector< 3, T >& pMin,
-                 const vector< 3, T >& pMax)
+AABB< T >::AABB( const vector< 3, T >& pMin, const vector< 3, T >& pMax)
     : _min( pMin )
     , _max( pMax )
 {}
 
-template< typename T >
-AABB< T >::AABB( const vector< 4, T >& sphere )
+template< typename T > AABB< T >::AABB( const vector< 4, T >& sphere )
 {
     _max = _min = sphere.getCenter();
     _max += sphere.getRadius();
     _min -= sphere.getRadius();
 }
 
-template< typename T >
-AABB< T >::AABB( T cx, T cy, T cz, T size )
+template< typename T > inline bool AABB< T >::isIn( const vector< 3, T >& pos )
 {
-    _max = _min = vector< 3, T >( cx, cy, cz );
-    _max += size;
-    _min -= size;
+    if ( pos.x() > _max.x() || pos.y() > _max.y() || pos.z() > _max.z() ||
+         pos.x() < _min.x() || pos.y() < _min.y() || pos.z() < _min.z( ))
+    {
+        return false;
+    }
+    return true;
 }
 
-template< typename T >
-inline bool AABB< T >::isIn( const vector< 4, T >& sphere )
+template< typename T > inline
+bool AABB< T >::isIn( const vector< 4, T >& sphere )
 {
     const vector< 3, T >& sv = sphere.getCenter();
     sv += sphere.getRadius();
@@ -170,64 +170,12 @@ inline bool AABB< T >::isIn( const vector< 4, T >& sphere )
     return true;
 }
 
-template< typename T >
-inline bool AABB< T >::isIn( const vector< 3, T >& pos )
-{
-    if ( pos.x() > _max.x() || pos.y() > _max.y() || pos.z() > _max.z() ||
-         pos.x() < _min.x() || pos.y() < _min.y() || pos.z() < _min.z( ))
-    {
-        return false;
-    }
-    return true;
-}
-
-template< typename T >
-inline bool AABB< T >::isIn2d( const vector< 3, T >& pos )
-{
-    if ( pos.x() > _max.x() || pos.y() > _max.y() || pos.x() < _min.x() ||
-         pos.y() < _min.y( ))
-    {
-        return false;
-    }
-    return true;
-}
-
-template< typename T >
-inline void AABB< T >::set( const vector< 3, T >& pMin,
-                            const vector< 3, T >& pMax )
-{
-    _min = pMin;
-    _max = pMax;
-}
-
-template< typename T >
-inline void AABB< T >::set( T cx, T cy, T cz, T size )
-{
-    vector< 3, T > center( cx, cy, cz );
-    _min = center - size;
-    _max = center + size;
-}
-
-template< typename T >
-inline void AABB< T >::setMin( const vector< 3, T >& pMin )
-{
-    _min = pMin;
-}
-
-template< typename T >
-inline void AABB< T >::setMax( const vector< 3, T >& pMax )
-{
-    _max = pMax;
-}
-
-template< typename T >
-inline const vector< 3, T >& AABB< T >::getMin() const
+template< typename T > inline const vector< 3, T >& AABB< T >::getMin() const
 {
     return _min;
 }
 
-template< typename T >
-inline const vector< 3, T >& AABB< T >::getMax() const
+template< typename T > inline const vector< 3, T >& AABB< T >::getMax() const
 {
     return _max;
 }
@@ -242,88 +190,24 @@ template< typename T > inline vector< 3, T >& AABB< T >::getMax()
     return _max;
 }
 
-template< typename T > AABB< T >
-AABB< T >::operator*( const T value ) const
-{
-    AABB result = *this;
-    result *= value;
-    return result;
-}
-
-template< typename T > AABB< T >
-AABB< T >::operator/( const T value ) const
-{
-    AABB result = *this;
-    result /= value;
-    return result;
-}
-
-template< typename T > AABB< T >
-AABB< T >::operator+( const T value ) const
-{
-    AABB result = *this;
-    result += value;
-    return result;
-}
-
-template< typename T > AABB< T >
-AABB< T >::operator-( const T value ) const
-{
-    AABB result = *this;
-    result -= value;
-    return result;
-}
-
-template< typename T >
-void AABB< T >::operator*=( const T value )
-{
-    _min *= value;
-    _max *= value;
-}
-
-template< typename T >
-void AABB< T >::operator/=( const T value )
-{
-    _min /= value;
-    _max /= value;
-}
-
-template< typename T >
-void AABB< T >::operator+=( const T value )
-{
-    _min += value;
-    _max += value;
-}
-
-template< typename T >
-void AABB< T >::operator-=( const T value )
-{
-    _min -= value;
-    _max -= value;
-}
-
-template< typename T > template< class U > bool
-AABB< T >::operator==( const AABB< U >& other )
-    const
+template< typename T > inline
+bool AABB< T >::operator==( const AABB< T >& other ) const
 {
     return _min == other._min && _max == other._max;
 }
 
-template< typename T > template< class U > bool
-AABB< T >::operator!=( const AABB< U >& other )
-    const
+template< typename T > inline
+bool AABB< T >::operator!=( const AABB< T >& other ) const
 {
     return _min != other._min || _max != other._max;
 }
 
-template< typename T >
-vector< 3, T > AABB< T >::getCenter() const
+template< typename T > vector< 3, T > AABB< T >::getCenter() const
 {
     return _min + ( ( _max - _min ) * 0.5f );
 }
 
-template< typename T >
-vector< 3, T > AABB< T >::getDimension() const
+template< typename T > vector< 3, T > AABB< T >::getSize() const
 {
     return _max - _min;
 }
@@ -367,8 +251,7 @@ void AABB< T >::merge( const vector< 3, T >& point )
         _max.z() = point.z();
 }
 
-template< typename T > inline
-void AABB< T >::setEmpty()
+template< typename T > inline void AABB< T >::reset()
 {
     _min = std::numeric_limits< T >::max();
     _max = -std::numeric_limits< T >::max();

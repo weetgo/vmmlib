@@ -1055,7 +1055,7 @@ vector< 3, T >& vector< M, T >::rotate( const T theta, vector< M, TT > axis,
 
     axis.normalize();
     return *this = vector< 3, T >(
-        (costheta + ( 1.0f - costheta ) * axis.x() * axis.x() ) * x()    +
+        (costheta + ( 1 - costheta ) * axis.x() * axis.x() ) * x()    +
         (( 1 - costheta ) * axis.x() * axis.y() - axis.z() * sintheta ) * y() +
         (( 1 - costheta ) * axis.x() * axis.z() + axis.y() * sintheta ) * z(),
 
@@ -1401,28 +1401,22 @@ vector< M, T >::sqrt_elementwise()
     }
 }
 
-template< size_t M, typename T >
-void
-vector< M, T >::reciprocal()
+template< size_t M, typename T > void vector< M, T >::reciprocal()
 {
     for( iterator it = begin(), it_end = end(); it != it_end; ++it )
-    {
-        (*it) = static_cast< T >( 1.0 ) / (*it);
-    }
+        (*it) = static_cast< T >( 1 ) / (*it);
 }
 
-template< size_t M, typename T >
-void
-vector< M, T >::reciprocal_safe()
+template< size_t M, typename T > void vector< M, T >::reciprocal_safe()
 {
     for( iterator it = begin(), it_end = end(); it != it_end; ++it )
     {
         T& v = *it;
 
-        if ( v == static_cast< T >( 0 ) )
+        if( v == 0 )
             v = std::numeric_limits< T >::max();
         else
-            v = static_cast< T >( 1.0 ) / v;
+            v = static_cast< T >( 1 ) / v;
     }
 }
 
