@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2014, Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2014-2016, Stefan.Eilemann@epfl.ch
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,23 +40,31 @@ static void _testCull( const vmml::frustum_culler< float >& fc )
 
     BOOST_CHECK_EQUAL( fc.test_sphere( sphereIn ), vmml::VISIBILITY_FULL );
     BOOST_CHECK_EQUAL( fc.test_sphere( sphereOut ), vmml::VISIBILITY_NONE );
-    BOOST_CHECK_EQUAL( fc.test_sphere( sphereBorder ), vmml::VISIBILITY_PARTIAL );
+    BOOST_CHECK_EQUAL( fc.test_sphere( sphereBorder ),
+                       vmml::VISIBILITY_PARTIAL );
 
-    const vmml::vector< 2, float > xy( -1.f, 1.f );
-    const vmml::vector< 2, float > zIn( -2.f, -4.f );
-    const vmml::vector< 2, float > zOut( 0.f, -.5f );
-    const vmml::vector< 2, float > zBorder( -.5f, -1.5f );
+    const vmml::Vector2f xy( -1.f, 1.f );
+    const vmml::Vector2f zIn( -2.f, -4.f );
+    const vmml::Vector2f zOut( 0.f, -.5f );
+    const vmml::Vector2f zBorder( -.5f, -1.5f );
 
     BOOST_CHECK_EQUAL( fc.test_aabb( xy, xy, zIn ), vmml::VISIBILITY_FULL );
     BOOST_CHECK_EQUAL( fc.test_aabb( xy, xy, zOut ), vmml::VISIBILITY_NONE );
-    BOOST_CHECK_EQUAL( fc.test_aabb( xy, xy, zBorder ), vmml::VISIBILITY_PARTIAL );
+    BOOST_CHECK_EQUAL( fc.test_aabb( xy, xy, zBorder ),
+                       vmml::VISIBILITY_PARTIAL );
 }
 
-
-BOOST_AUTO_TEST_CASE(frustum_base)
+BOOST_AUTO_TEST_CASE( convert )
 {
-    const vmml::frustum< float > frustum( -1.f, 1., -1.f, 1., 1.f, 100.f );
-    const vmml::matrix< 4, 4, float > mvp = frustum.compute_matrix();
+    const vmml::Frustumf f1;
+    const vmml::Frustumf f2( f1.computePerspectiveMatrix( ));
+    BOOST_CHECK_MESSAGE( f1.equals( f2, 0.0001f ), f2 );
+}
+
+BOOST_AUTO_TEST_CASE( base )
+{
+    const vmml::Frustumf frustum( -1.f, 1., -1.f, 1., 1.f, 100.f );
+    const vmml::matrix< 4, 4, float > mvp = frustum.computePerspectiveMatrix();
 
     vmml::frustum_culler< float > fc;
     fc.setup( mvp );
@@ -67,14 +75,14 @@ BOOST_AUTO_TEST_CASE(frustum_base)
     // | a b | |
     // | c d |/h
     //  -----
-    const vmml::vector< 3, float > a( -1.f,  1.f, -1.f );
-    const vmml::vector< 3, float > b(  1.f,  1.f, -1.f );
-    const vmml::vector< 3, float > c( -1.f, -1.f, -1.f );
-    const vmml::vector< 3, float > d(  1.f, -1.f, -1.f );
-    const vmml::vector< 3, float > e( -100.f,  100.f, -100.f );
-    const vmml::vector< 3, float > f(  100.f,  100.f, -100.f );
-    const vmml::vector< 3, float > g( -100.f, -100.f, -100.f );
-    const vmml::vector< 3, float > h(  100.f, -100.f, -100.f );
+    const vmml::Vector3f a( -1.f,  1.f, -1.f );
+    const vmml::Vector3f b(  1.f,  1.f, -1.f );
+    const vmml::Vector3f c( -1.f, -1.f, -1.f );
+    const vmml::Vector3f d(  1.f, -1.f, -1.f );
+    const vmml::Vector3f e( -100.f,  100.f, -100.f );
+    const vmml::Vector3f f(  100.f,  100.f, -100.f );
+    const vmml::Vector3f g( -100.f, -100.f, -100.f );
+    const vmml::Vector3f h(  100.f, -100.f, -100.f );
 
     fc.setup( a, b, c, d, e, f, g, h );
     _testCull( fc );

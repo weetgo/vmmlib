@@ -172,8 +172,9 @@ public:
     void normal( const quaternion& aa, const quaternion& bb, const quaternion& cc,  const quaternion& dd );
     quaternion normal( const quaternion& aa, const quaternion& bb, const quaternion& cc );
 
-    // to combine two rotations, multiply the respective quaternions before using rotate
-    // instead of rotating twice for increased performance, but be aware of non-commutativity!
+    // to combine two rotations, multiply the respective quaternions before
+    // using rotate instead of rotating twice for increased performance, but be
+    // aware of non-commutativity!
     void rotate( T theta, const vector< 3, T >& a );
     quaternion rotate( T theta, vector< 3, T >& axis, const vector< 3, T >& a );
     quaternion rotate_x( T theta, const vector< 3, T >& a );
@@ -827,10 +828,10 @@ quaternion< T > quaternion< T >::normal( const quaternion< T >& aa,
     return tmp;
 }
 
-
-// to combine two rotations, multiply the respective quaternions before using rotate
-// instead of rotating twice for increased performance, but be aware of non-commutativity!
-// (the first rotation quaternion has to be the first factor)
+// to combine two rotations, multiply the respective quaternions before using
+// rotate instead of rotating twice for increased performance, but be aware of
+// non-commutativity!  (the first rotation quaternion has to be the first
+// factor)
 template< typename T >
 quaternion< T > quaternion< T >::rotate( T theta, vector< 3, T >& axis,
                                          const vector< 3, T >& a )

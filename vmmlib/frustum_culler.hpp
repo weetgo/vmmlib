@@ -96,13 +96,8 @@ private:
 
 }; // class frustum_culler
 
-
-#ifndef VMMLIB_NO_TYPEDEFS
-
-typedef frustum_culler< float >  frustum_cullerf;
-typedef frustum_culler< double > frustum_cullerd;
-
-#endif
+typedef frustum_culler< float >  FrustumCullerf;
+typedef frustum_culler< double > FrustumCullerd;
 
 } // namespace vmml
 

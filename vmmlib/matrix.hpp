@@ -415,11 +415,10 @@ public:
     //   inline bool is_valid() const;  -> moved to class validator
 
     // legacy/compatibility accessor
-    struct row_accessor
+    struct row
     {
-        row_accessor( T* array_ ) : array( array_ ) {}
-        T&
-        operator[]( size_t col_index )
+        row( T* array_ ) : array( array_ ) {}
+        T& operator[]( const size_t col_index )
         {
             #ifdef VMMLIB_SAFE_ACCESSORS
             if ( col_index >= N )
@@ -428,8 +427,7 @@ public:
             return array[ col_index * M ];
         }
 
-        const T&
-        operator[]( size_t col_index ) const
+        const T& operator[]( const size_t col_index ) const
         {
             #ifdef VMMLIB_SAFE_ACCESSORS
             if ( col_index >= N )
@@ -438,22 +436,23 @@ public:
             return array[ col_index * M ];
         }
 
+    private:
+        row() {} // disallow std ctor
         T* array;
-        private: row_accessor() {} // disallow std ctor
     };
     // this is a hack to allow array-style access to matrix elements
     // usage: matrix< 2, 2, float > m; m[ 1 ][ 0 ] = 37.0f;
-    inline row_accessor operator[]( size_t row_index )
+    inline row operator[]( const size_t row_index )
     {
         #ifdef VMMLIB_SAFE_ACCESSORS
         if ( row_index > M )
             VMMLIB_ERROR( "row index out of bounds", VMMLIB_HERE );
         #endif
-        return row_accessor( array + row_index );
+        return row( array + row_index );
     }
 
     // this is a hack to remove a warning about implicit conversions
-    inline row_accessor operator[]( int row_index )
+    inline row operator[]( int row_index )
     {
         return ( *this )[ size_t ( row_index ) ];
     }

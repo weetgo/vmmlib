@@ -144,7 +144,7 @@ public:
     bool operator==( const vector& other ) const;
     bool operator!=( const vector& other ) const;
     bool equals( const vector& other,
-                 T tolerance = std::numeric_limits< T >::epsilon() ) const;
+                 T tolerance = std::numeric_limits< T >::epsilon( )) const;
     bool operator<( const vector& other ) const;
 
     // remember kids: c_arrays are dangerous and evil!
