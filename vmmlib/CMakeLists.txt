@@ -4,7 +4,6 @@
 set(VMMLIB_PUBLIC_HEADERS
   aabb.hpp
   enable_if.hpp
-  exception.hpp
   frustum.hpp
   frustum_culler.hpp
   intersection.hpp
@@ -12,7 +11,6 @@ set(VMMLIB_PUBLIC_HEADERS
   math.hpp
   matrix.hpp
   matrix_functors.hpp
-  qr_decomposition.hpp
   quaternion.hpp
   util.hpp
   vector.hpp

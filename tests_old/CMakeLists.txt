@@ -8,7 +8,6 @@ set(TESTS
   matrix_test.cpp
   perf_test.cpp
   performance_test.cpp
-  qr_decomposition_test.cpp
   quaternion_test.cpp
   timer.cpp
   unit_test.cpp

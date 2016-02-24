@@ -38,7 +38,6 @@
 #include <vmmlib/math.hpp>
 #include <vmmlib/enable_if.hpp>
 
-#include <vmmlib/exception.hpp>
 #include <vmmlib/vmmlib_config.hpp>
 
 #include <algorithm>
@@ -667,9 +666,8 @@ quaternion< T >
 quaternion< T >::operator/( T a_ ) const
 {
     if ( a_ == 0.0 )
-    {
-        VMMLIB_ERROR( "Division by zero.", VMMLIB_HERE );
-    }
+        throw std::runtime_error( "Division by zero." );
+
     a_ = 1.0 / a_;
     return quaternion( x() * a_, y() * a_, z() * a_, w() * a_ );
 }
@@ -691,9 +689,8 @@ template < typename T >
 void quaternion< T >::operator/=( T q )
 {
     if ( q == 0.0 )
-    {
-        VMMLIB_ERROR( "Division by zero", VMMLIB_HERE );
-    }
+        throw std::runtime_error( "Division by zero" );
+
     q = 1.0f / q;
     this->operator*=( q );
 }

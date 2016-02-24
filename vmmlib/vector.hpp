@@ -36,7 +36,6 @@
 #include <vmmlib/vmmlib_config.hpp>
 #include <vmmlib/math.hpp>
 #include <vmmlib/enable_if.hpp>
-#include <vmmlib/exception.hpp>
 
 #include <algorithm>
 #include <cstring>
@@ -50,8 +49,7 @@
 namespace vmml
 {
 
-template< size_t M, typename T = float >
-class vector
+template< size_t M, typename T > class vector
 {
 public:
     typedef T                                       value_type;
@@ -631,12 +629,8 @@ template< size_t M, typename T >
 inline T&
 vector< M, T >::at( size_t index )
 {
-    #ifdef VMMLIB_SAFE_ACCESSORS
-    if ( index >= M )
-    {
-        VMMLIB_ERROR( "at() - index out of bounds", VMMLIB_HERE );
-    }
-    #endif
+    if( index >= M )
+        throw std::runtime_error( "at() - index out of bounds" );
     return array[ index ];
 }
 
@@ -644,12 +638,8 @@ template< size_t M, typename T >
 inline const T&
 vector< M, T >::at( size_t index ) const
 {
-    #ifdef VMMLIB_SAFE_ACCESSORS
     if ( index >= M )
-    {
-        VMMLIB_ERROR( "at() - index out of bounds", VMMLIB_HERE );
-    }
-    #endif
+        throw std::runtime_error( "at() - index out of bounds" );
     return array[ index ];
 }
 

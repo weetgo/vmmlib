@@ -49,11 +49,4 @@ typedef SSIZE_T ssize_t;
 // will not work anymore.
 //#define VMMLIB_NO_CONVERSION_OPERATORS
 
-#ifndef VMMLIB_CUSTOM_CONFIG
-#  ifndef NDEBUG
-#    define VMMLIB_SAFE_ACCESSORS
-#  endif
-#  define VMMLIB_THROW_EXCEPTIONS
-#endif
-
 #endif

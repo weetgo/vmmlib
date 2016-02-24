@@ -41,15 +41,12 @@
  */
 namespace vmml
 {
-
 template < bool condition, typename T = void >
 struct enable_if { typedef T type; };
 
-template< typename T >
-struct enable_if< false, T > {};
+template< typename T > struct enable_if< false, T > {};
 
 } // namespace vmml
 
 
 #endif
-

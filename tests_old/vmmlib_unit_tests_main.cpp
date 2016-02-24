@@ -6,7 +6,6 @@
 #include "lowpass_filter_test.hpp"
 #include "intersection_test.hpp"
 #include "quaternion_test.hpp"
-#include "qr_decomposition_test.hpp"
 #include "util_test.hpp"
 
 void run_and_log( vmml::unit_test& test )
@@ -28,9 +27,6 @@ int main( int, const char** )
 
     vmml::quaternion_test quaternion_test_;
     run_and_log( quaternion_test_ );
-
-	vmml::qr_decomposition_test qr_test_;
-	run_and_log( qr_test_ );
 
     vmml::util_test util_test_;
     run_and_log( util_test_ );
