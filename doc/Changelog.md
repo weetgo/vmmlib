@@ -1,8 +1,8 @@
 # Changelog {#Changelog}
 
-# git master {#master}
+# git master
 
-# Release 1.9 (02-11-2015) {#Release1_9}
+# Release 1.9 (02-11-2015)
 
 * [35](https://github.com/Eyescale/vmmlib/pull/35):
   Fix Vector::rotate, cross and compute_normal, add Matrix-from-iter-ctor
@@ -14,7 +14,7 @@
 * [23](https://github.com/Eyescale/vmmlib/pull/23):
   Implement Vector::product
 
-# Release 1.8 (03-10-2014) {#Release1_8}
+# Release 1.8 (03-10-2014)
 
 * Sanitization of matrix::get_translation API
 * Compilation options and warnings cleanup

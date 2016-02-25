@@ -85,7 +85,7 @@ public:
     void adjustNearPlane( const T nearPlane );
 
     /** @name Access to frustum corners */
-    //*{
+    //@{
     T& left() { return _array[0]; }
     T left() const { return _array[0]; }
 
@@ -103,7 +103,7 @@ public:
 
     T& farPlane() { return _array[5]; }
     T farPlane() const { return _array[5]; }
-    //*}
+    //@}
 
     /** @return the width of this frustum at the near plane */
     T getWidth() const;

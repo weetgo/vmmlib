@@ -31,7 +31,7 @@ set(DOCS README.md LICENSE.txt ACKNOWLEDGEMENTS)
 install(FILES ${DOCS} DESTINATION share/vmmlib COMPONENT dev)
 
 set(DOXYGEN_MAINPAGE_MD README.md)
-set(DOXYGEN_EXTRA_INPUT ${PROJECT_SOURCE_DIR}/README.md)
+set(DOXYGEN_EXTRA_INPUT ${PROJECT_SOURCE_DIR}/README.md ${PROJECT_SOURCE_DIR}/doc)
 include(DoxygenRule) # must be after all targets
 include(CPackConfig)
 include(CTest)
