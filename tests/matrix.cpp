@@ -28,6 +28,7 @@
 
 #include <vmmlib/matrix.hpp>
 #include <vmmlib/math.hpp>
+#include <vmmlib/types.hpp>
 
 #define BOOST_TEST_MODULE matrix
 #include <boost/test/unit_test.hpp>

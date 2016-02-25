@@ -2,6 +2,7 @@
 
 #include <vmmlib/vector.hpp>
 #include <vmmlib/matrix.hpp>
+#include <vmmlib/types.hpp>
 #include <vmmlib/util.hpp>
 #include <sstream>
 #include <cmath>

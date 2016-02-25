@@ -27,31 +27,33 @@
  */
 
 #include <vmmlib/frustum.hpp>
-#include <vmmlib/frustum_culler.hpp>
+#include <vmmlib/frustumCuller.hpp>
+#include <vmmlib/types.hpp>
 
 #define BOOST_TEST_MODULE frustum
 #include <boost/test/unit_test.hpp>
 
-static void _testCull( const vmml::frustum_culler< float >& fc )
+static void _testCull( const vmml::FrustumCullerf& fc )
 {
     const vmml::vector< 4, float > sphereIn( 0.f, 0.f, -10.f, 1.f );
     const vmml::vector< 4, float > sphereOut( 0.f, 0.f, 0.f, .5f );
     const vmml::vector< 4, float > sphereBorder( 0.f, 0.f, -1.f, 1.f );
 
-    BOOST_CHECK_EQUAL( fc.test_sphere( sphereIn ), vmml::VISIBILITY_FULL );
-    BOOST_CHECK_EQUAL( fc.test_sphere( sphereOut ), vmml::VISIBILITY_NONE );
-    BOOST_CHECK_EQUAL( fc.test_sphere( sphereBorder ),
+    BOOST_CHECK_EQUAL( fc.test( sphereIn ), vmml::VISIBILITY_FULL );
+    BOOST_CHECK_EQUAL( fc.test( sphereOut ), vmml::VISIBILITY_NONE );
+    BOOST_CHECK_EQUAL( fc.test( sphereBorder ),
                        vmml::VISIBILITY_PARTIAL );
 
-    const vmml::Vector2f xy( -1.f, 1.f );
-    const vmml::Vector2f zIn( -2.f, -4.f );
-    const vmml::Vector2f zOut( 0.f, -.5f );
-    const vmml::Vector2f zBorder( -.5f, -1.5f );
+    vmml::AABBf aabbIn( vmml::Vector3f( -1.f, -1.f, -4.f ),
+                        vmml::Vector3f( 1.f, 1.f, -2.f ));
+    vmml::AABBf aabbOut( vmml::Vector3f( -1.f, -1.f, -.5f ),
+                         vmml::Vector3f( 1.f, 1.f, 0.f ));
+    vmml::AABBf aabbBorder( vmml::Vector3f( -1.f, -1.f, -1.5f ),
+                            vmml::Vector3f( 1.f, 1.f, -.5f ));
 
-    BOOST_CHECK_EQUAL( fc.test_aabb( xy, xy, zIn ), vmml::VISIBILITY_FULL );
-    BOOST_CHECK_EQUAL( fc.test_aabb( xy, xy, zOut ), vmml::VISIBILITY_NONE );
-    BOOST_CHECK_EQUAL( fc.test_aabb( xy, xy, zBorder ),
-                       vmml::VISIBILITY_PARTIAL );
+    BOOST_CHECK_EQUAL( fc.test( aabbIn ), vmml::VISIBILITY_FULL );
+    BOOST_CHECK_EQUAL( fc.test( aabbOut ), vmml::VISIBILITY_NONE );
+    BOOST_CHECK_EQUAL( fc.test( aabbBorder ), vmml::VISIBILITY_PARTIAL );
 }
 
 BOOST_AUTO_TEST_CASE( convert )
@@ -66,8 +68,7 @@ BOOST_AUTO_TEST_CASE( base )
     const vmml::Frustumf frustum( -1.f, 1., -1.f, 1., 1.f, 100.f );
     const vmml::matrix< 4, 4, float > mvp = frustum.computePerspectiveMatrix();
 
-    vmml::frustum_culler< float > fc;
-    fc.setup( mvp );
+    const vmml::FrustumCullerf fc( mvp );
     _testCull( fc );
 
     //   e_____f
@@ -84,6 +85,6 @@ BOOST_AUTO_TEST_CASE( base )
     const vmml::Vector3f g( -100.f, -100.f, -100.f );
     const vmml::Vector3f h(  100.f, -100.f, -100.f );
 
-    fc.setup( a, b, c, d, e, f, g, h );
-    _testCull( fc );
+    const vmml::FrustumCullerf fc2( a, b, c, d, e, f, g, h );
+    _testCull( fc2 );
 }

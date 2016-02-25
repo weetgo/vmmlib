@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014, Visualization and Multimedia Lab,
+ * Copyright (c) 2006-2016, Visualization and Multimedia Lab,
  *                          University of Zurich <http://vmml.ifi.uzh.ch>,
  *                          Eyescale Software GmbH,
  *                          Blue Brain Project, EPFL
@@ -38,8 +38,6 @@
 #include <vmmlib/math.hpp>
 #include <vmmlib/enable_if.hpp>
 
-#include <vmmlib/vmmlib_config.hpp>
-
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -56,8 +54,7 @@
 namespace vmml
 {
 
-template < typename T >
-class quaternion : private vector< 4, T >
+template < typename T > class quaternion : private vector< 4, T >
 {
 public:
     typedef vector< 4, T >  super;
@@ -205,13 +202,6 @@ public:
     static const quaternion QUATERK;
 
 }; // class quaternion
-
-#ifndef VMMLIB_NO_TYPEDEFS
-
-typedef quaternion< float >  Quaternionf;
-typedef quaternion< double > Quaterniond;
-
-#endif
 
 // - implementation - //
 

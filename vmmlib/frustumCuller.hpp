@@ -30,48 +30,55 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __VMML__FRUSTUM_CULLER__HPP__
-#define __VMML__FRUSTUM_CULLER__HPP__
+#ifndef __VMML__FRUSTUMCULLER__HPP__
+#define __VMML__FRUSTUMCULLER__HPP__
 
-#include <vmmlib/vector.hpp>
-#include <vmmlib/matrix.hpp>
-#include <vmmlib/visibility.hpp>
+#include <vmmlib/aabb.hpp> // inline parameter
+#include <vmmlib/matrix.hpp> // inline parameter
+#include <vmmlib/vector.hpp> // member
+#include <vmmlib/visibility.hpp> // return value
 
 // - declaration -
 
 namespace vmml
 {
 
-/** Helper class for OpenGL view frustum culling. */
-template< class T >
-class frustum_culler
+/** Helper class to perform OpenGL view frustum culling. */
+template< class T > class FrustumCuller
 {
 public:
     typedef vector< 2, T > vec2;
     typedef vector< 3, T > vec3;
     typedef vector< 4, T > vec4;
 
-    // contructors
-    frustum_culler() {}
-    ~frustum_culler(){}
+    /** Construct a new frustum culler */
+    FrustumCuller() {}
 
-    /** Set up the culling state using a 4x4 projection*modelView matrix. */
-    void setup( const matrix< 4, 4, T >& proj_modelview );
+    /** Construct a frustum culler using a 4x4 projection*model*view matrix. */
+    explicit FrustumCuller( const matrix< 4, 4, T >& projModelView );
 
     /**
-     * Set up the culling state using the eight frustum corner points.
+     * Construct a frustum culler using the eight frustum corner points.
      * Corner naming is n(ear)|f(ar), l(eft)|r(ight), t(op)|b(ottom)
      */
-    void setup( const vec3& nlt, const vec3& nrt,
-                const vec3& nlb, const vec3& nrb,
-                const vec3& flt, const vec3& frt,
-                const vec3& flb, const vec3& frb );
+    FrustumCuller( const vec3& nlt, const vec3& nrt,
+                   const vec3& nlb, const vec3& nrb,
+                   const vec3& flt, const vec3& frt,
+                   const vec3& flb, const vec3& frb );
 
-    Visibility test_sphere( const vec4& sphere ) const;
-    Visibility test_aabb( const vec2& x, const vec2& y, const vec2& z ) const;
+    /** Destruct this frustum culler. */
+    ~FrustumCuller(){}
+
+    /** @return the visibility of the given sphere */
+    Visibility test( const vec4& sphere ) const;
+
+    /** @return the visibility of the axis-aligned bounding box */
+    Visibility test( const AABB< T >& aabb ) const;
+
+    /** @return the plane equation of the current near plane. */
     const vec4& getNearPlane() const { return _nearPlane; }
 
-    friend std::ostream& operator << (std::ostream& os, const frustum_culler& f)
+    friend std::ostream& operator << (std::ostream& os, const FrustumCuller& f)
     {
         return os << "Frustum cull planes: " << std::endl
                   << "    left   " << f._leftPlane << std::endl
@@ -84,9 +91,8 @@ public:
 
 private:
     inline void _normalizePlane( vec4& plane ) const;
-    inline Visibility _test_aabb( const vec4& plane, const vec3& middle,
-                                  const vec3& size_2 ) const;
-
+    inline Visibility _test( const vec4& plane, const vec3& middle,
+                             const vec3& size_2 ) const;
     vec4    _leftPlane;
     vec4    _rightPlane;
     vec4    _bottomPlane;
@@ -94,11 +100,7 @@ private:
     vec4    _nearPlane;
     vec4    _farPlane;
 
-}; // class frustum_culler
-
-typedef frustum_culler< float >  FrustumCullerf;
-typedef frustum_culler< double > FrustumCullerd;
-
+}; // class FrustumCuller
 } // namespace vmml
 
 // - implementation - //
@@ -112,14 +114,13 @@ namespace vmml
  * matrix. The projection matrix should contain the viewing transformation.
  */
 template < class T >
-void frustum_culler< T >::setup( const matrix< 4, 4, T >& proj_modelview )
+FrustumCuller< T >::FrustumCuller( const matrix< 4, 4, T >& projModelView )
 {
     // See http://www2.ravensoft.com/users/ggribb/plane%20extraction.pdf pp.5
-
-    const vec4& row0 = proj_modelview.get_row( 0 );
-    const vec4& row1 = proj_modelview.get_row( 1 );
-    const vec4& row2 = proj_modelview.get_row( 2 );
-    const vec4& row3 = proj_modelview.get_row( 3 );
+    const vec4& row0 = projModelView.get_row( 0 );
+    const vec4& row1 = projModelView.get_row( 1 );
+    const vec4& row2 = projModelView.get_row( 2 );
+    const vec4& row3 = projModelView.get_row( 3 );
 
     _leftPlane   = row3 + row0;
     _rightPlane  = row3 - row0;
@@ -137,10 +138,10 @@ void frustum_culler< T >::setup( const matrix< 4, 4, T >& proj_modelview )
 }
 
 template < class T >
-void frustum_culler< T >::setup( const vec3& a, const vec3& b,
-                                 const vec3& c, const vec3& d,
-                                 const vec3& e, const vec3& f,
-                                 const vec3& g, const vec3& h )
+FrustumCuller< T >::FrustumCuller( const vec3& a, const vec3& b,
+                                   const vec3& c, const vec3& d,
+                                   const vec3& e, const vec3& f,
+                                   const vec3& g, const vec3& h )
 {
     //   e_____f
     //  /____ /|
@@ -158,7 +159,7 @@ void frustum_culler< T >::setup( const vec3& a, const vec3& b,
 
 template < class T >
 inline void
-frustum_culler< T >::_normalizePlane( vector< 4, T >& plane ) const
+FrustumCuller< T >::_normalizePlane( vector< 4, T >& plane ) const
 {
     const vec3& v3 = plane.template get_sub_vector< 3 >();
     const T len_i = 1.0 / v3.length();
@@ -170,7 +171,7 @@ frustum_culler< T >::_normalizePlane( vector< 4, T >& plane ) const
 
 
 template < class T > Visibility
-frustum_culler< T >::test_sphere( const vector< 4, T >& sphere ) const
+FrustumCuller< T >::test( const vector< 4, T >& sphere ) const
 {
     Visibility visibility = VISIBILITY_FULL;
 
@@ -228,9 +229,8 @@ frustum_culler< T >::test_sphere( const vector< 4, T >& sphere ) const
 }
 
 template < class T >
-Visibility frustum_culler< T >::_test_aabb( const vec4& plane,
-                                            const vec3& middle,
-                                            const vec3& extent ) const
+Visibility FrustumCuller< T >::_test( const vec4& plane, const vec3& middle,
+                                      const vec3& extent ) const
 {
     // http://www.cescg.org/CESCG-2002/DSykoraJJelinek/index.html
     const T d = plane.dot( middle );
@@ -246,49 +246,47 @@ Visibility frustum_culler< T >::_test_aabb( const vec4& plane,
 }
 
 template < class T >
-Visibility frustum_culler< T >::test_aabb( const vec2& x, const vec2& y,
-                                           const vec2& z ) const
+Visibility FrustumCuller< T >::test( const AABB< T >& aabb ) const
 {
     Visibility result = VISIBILITY_FULL;
-    const vec3& middle = vec3( x[0] + x[1], y[0] + y[1], z[0] + z[1] ) * .5;
-    const vec3& extent = vec3( fabs(x[1] - x[0]), fabs(y[1] - y[0]),
-                               fabs(z[1] - z[0]) ) * .5;
-    switch( _test_aabb( _leftPlane, middle, extent ))
+    const vec3& middle = aabb.getCenter();
+    const vec3& extent = aabb.getSize() * 0.5f;
+    switch( _test( _leftPlane, middle, extent ))
     {
         case VISIBILITY_FULL: break;
         case VISIBILITY_PARTIAL: result = VISIBILITY_PARTIAL; break;
         case VISIBILITY_NONE: return VISIBILITY_NONE;
     }
 
-    switch( _test_aabb( _rightPlane, middle, extent ))
+    switch( _test( _rightPlane, middle, extent ))
     {
         case VISIBILITY_FULL: break;
         case VISIBILITY_PARTIAL: result = VISIBILITY_PARTIAL; break;
         case VISIBILITY_NONE: return VISIBILITY_NONE;
     }
 
-    switch( _test_aabb( _bottomPlane, middle, extent ))
+    switch( _test( _bottomPlane, middle, extent ))
     {
         case VISIBILITY_FULL: break;
         case VISIBILITY_PARTIAL: result = VISIBILITY_PARTIAL; break;
         case VISIBILITY_NONE: return VISIBILITY_NONE;
     }
 
-    switch( _test_aabb( _topPlane, middle, extent ))
+    switch( _test( _topPlane, middle, extent ))
     {
         case VISIBILITY_FULL: break;
         case VISIBILITY_PARTIAL: result = VISIBILITY_PARTIAL; break;
         case VISIBILITY_NONE: return VISIBILITY_NONE;
     }
 
-    switch( _test_aabb( _nearPlane, middle, extent ))
+    switch( _test( _nearPlane, middle, extent ))
     {
         case VISIBILITY_FULL: break;
         case VISIBILITY_PARTIAL: result = VISIBILITY_PARTIAL; break;
         case VISIBILITY_NONE: return VISIBILITY_NONE;
     }
 
-    switch( _test_aabb( _farPlane, middle, extent ))
+    switch( _test( _farPlane, middle, extent ))
     {
         case VISIBILITY_FULL: break;
         case VISIBILITY_PARTIAL: result = VISIBILITY_PARTIAL; break;

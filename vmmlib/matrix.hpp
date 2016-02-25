@@ -32,8 +32,6 @@
 #ifndef __VMML__MATRIX__HPP__
 #define __VMML__MATRIX__HPP__
 
-#include <vmmlib/vmmlib_config.hpp>
-
 #include <vmmlib/matrix_functors.hpp>
 #include <vmmlib/vector.hpp>
 #include <vmmlib/math.hpp>
@@ -53,8 +51,7 @@ namespace vmml
 {
 
 // matrix of type T with m rows and n columns
-template< size_t M, size_t N, typename T >
-class matrix
+template< size_t M, size_t N, typename T > class matrix
 {
 public:
     typedef T                                       value_type;
@@ -414,9 +411,9 @@ public:
     //   inline bool is_valid() const;  -> moved to class validator
 
     // legacy/compatibility accessor
-    struct row
+    struct row_accessor
     {
-        row( T* array_ ) : array( array_ ) {}
+        row_accessor( T* array_ ) : array( array_ ) {}
         T& operator[]( const size_t col_index )
         {
             if ( col_index >= N )
@@ -432,20 +429,20 @@ public:
         }
 
     private:
-        row() {} // disallow std ctor
+        row_accessor() {} // disallow std ctor
         T* array;
     };
     // this is a hack to allow array-style access to matrix elements
     // usage: matrix< 2, 2, float > m; m[ 1 ][ 0 ] = 37.0f;
-    inline row operator[]( const size_t row_index )
+    inline row_accessor operator[]( const size_t row_index )
     {
         if ( row_index > M )
             throw std::runtime_error( "row index out of bounds" );
-        return row( array + row_index );
+        return row_accessor( array + row_index );
     }
 
     // this is a hack to remove a warning about implicit conversions
-    inline row operator[]( int row_index )
+    inline row_accessor operator[]( int row_index )
     {
         return ( *this )[ size_t ( row_index ) ];
     }
@@ -482,13 +479,6 @@ public:
 
 }; // class matrix
 
-
-#ifndef VMMLIB_NO_TYPEDEFS
-typedef vmml::matrix< 3, 3, double > Matrix3d; //!< A 3x3 double matrix
-typedef vmml::matrix< 4, 4, double > Matrix4d; //!< A 4x4 double matrix
-typedef vmml::matrix< 3, 3, float >  Matrix3f; //!< A 3x3 float matrix
-typedef vmml::matrix< 4, 4, float >  Matrix4f; //!< A 4x4 float matrix
-#endif
 
 /*
 *   free functions

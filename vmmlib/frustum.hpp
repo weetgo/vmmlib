@@ -33,7 +33,6 @@
 #ifndef __VMML__FRUSTUM__HPP__
 #define __VMML__FRUSTUM__HPP__
 
-#include <vmmlib/vmmlib_config.hpp>
 #include <vmmlib/matrix.hpp> // used inline
 #include <cstring> // memcmp
 
@@ -133,10 +132,6 @@ public:
 private:
     T _array[6]; //!< left, right, bottom, top, near, far storage
 };
-
-typedef Frustum< float >  Frustumf;
-typedef Frustum< double > Frustumd;
-
 } // namespace vmml
 
 // - implementation - //
