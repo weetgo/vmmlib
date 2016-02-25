@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014, Visualization and Multimedia Lab,
+ * Copyright (c) 2006-2016, Visualization and Multimedia Lab,
  *                          University of Zurich <http://vmml.ifi.uzh.ch>,
  *                          Eyescale Software GmbH,
  *                          Blue Brain Project, EPFL
@@ -38,7 +38,7 @@
 
 #include <algorithm>
 #include <limits>
-#include <cmath>
+#include <cstdlib>
 
 namespace vmml
 {
@@ -49,11 +49,9 @@ namespace vmml
 #define M_PI_4_F	0.78539816339744830962f
 
 
-template< typename T, typename U >
-bool
-equals( T arg0, U arg1)
+template< typename T, typename U > bool equals( T arg0, U arg1)
 {
-    return fabs( arg0 - arg1 ) < std::numeric_limits< float >::epsilon();
+    return std::abs( arg0 - arg1 ) < std::numeric_limits< float >::epsilon();
 }
 
 

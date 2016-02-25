@@ -25,7 +25,6 @@ common_package_post()
 
 add_subdirectory(vmmlib)
 add_subdirectory(tests)
-add_subdirectory(tests_old)
 
 set(DOCS README.md LICENSE.txt ACKNOWLEDGEMENTS)
 install(FILES ${DOCS} DESTINATION share/vmmlib COMPONENT dev)

@@ -33,10 +33,10 @@
 #ifndef __VMML__QUATERNION__HPP__
 #define __VMML__QUATERNION__HPP__
 
-#include <vmmlib/vector.hpp>
-#include <vmmlib/matrix.hpp>
-#include <vmmlib/math.hpp>
 #include <vmmlib/enable_if.hpp>
+#include <vmmlib/math.hpp>
+#include <vmmlib/types.hpp>
+#include <vmmlib/vector.hpp> // base class
 
 #include <algorithm>
 #include <cassert>
@@ -107,7 +107,7 @@ public:
     bool operator!=( const vector< 4, T >& a ) const;
 
     bool is_akin( const quaternion& a,
-                 const T& delta = std::numeric_limits< T >::epsilon() );
+                  const T& delta = std::numeric_limits< T >::epsilon() );
 
     void conjugate();
     quaternion get_conjugate() const;
@@ -202,7 +202,12 @@ public:
     static const quaternion QUATERK;
 
 }; // class quaternion
+}
 
+#include <vmmlib/matrix.hpp>
+
+namespace vmml
+{
 // - implementation - //
 
 template < typename T >
@@ -847,7 +852,7 @@ quaternion< T > quaternion< T >::rotate_y( T theta, const vector< 3, T >& a )
 {
     quaternion< T > p = a;
     T alpha = theta / 2;
-    quaternion< T > q = std::cos( alpha ) + ( std::sin( alpha ) *  QUATERJ );
+    quaternion< T > q( std::cos( alpha ) + ( std::sin( alpha ) *  QUATERJ ));
     return q * p * q.invert();
 }
 

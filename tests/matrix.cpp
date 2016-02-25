@@ -51,3 +51,13 @@ BOOST_AUTO_TEST_CASE(base)
         BOOST_CHECK_EQUAL( matrix.array[ i ], matrix2.array[ i ] );
     }
 }
+
+BOOST_AUTO_TEST_CASE( construction )
+{
+    vmml::Matrix4f m1( vmml::Quaternionf(), vmml::Vector3f( 1.f, 2.f, 3.f ));
+    const float data[] = { 1, 0, 0, 0,
+                           0, 1, 0, 0,
+                           0, 0, 1, 0,
+                           1.f, 2.f, 3.f, 1 };
+    BOOST_CHECK_EQUAL( m1, vmml::Matrix4f( data, data + 16 ));
+}
