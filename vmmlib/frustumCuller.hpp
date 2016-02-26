@@ -44,7 +44,7 @@ namespace vmml
 {
 
 /** Helper class to perform OpenGL view frustum culling. */
-template< class T > class FrustumCuller
+template< typename T > class FrustumCuller
 {
 public:
     typedef vector< 2, T > vec2;
@@ -113,7 +113,7 @@ namespace vmml
  * Setup the culler by extracting the frustum planes from the projection
  * matrix. The projection matrix should contain the viewing transformation.
  */
-template < class T >
+template < typename T >
 FrustumCuller< T >::FrustumCuller( const matrix< 4, 4, T >& projModelView )
 {
     // See http://www2.ravensoft.com/users/ggribb/plane%20extraction.pdf pp.5
@@ -137,7 +137,7 @@ FrustumCuller< T >::FrustumCuller( const matrix< 4, 4, T >& projModelView )
     _normalizePlane( _farPlane );
 }
 
-template < class T >
+template < typename T >
 FrustumCuller< T >::FrustumCuller( const vec3& a, const vec3& b,
                                    const vec3& c, const vec3& d,
                                    const vec3& e, const vec3& f,
@@ -157,7 +157,7 @@ FrustumCuller< T >::FrustumCuller( const vec3& a, const vec3& b,
     _farPlane    = compute_plane( g, e, f );
 }
 
-template < class T >
+template < typename T >
 inline void
 FrustumCuller< T >::_normalizePlane( vector< 4, T >& plane ) const
 {
@@ -170,7 +170,7 @@ FrustumCuller< T >::_normalizePlane( vector< 4, T >& plane ) const
 }
 
 
-template < class T > Visibility
+template < typename T > Visibility
 FrustumCuller< T >::test( const vector< 4, T >& sphere ) const
 {
     Visibility visibility = VISIBILITY_FULL;
@@ -228,7 +228,7 @@ FrustumCuller< T >::test( const vector< 4, T >& sphere ) const
     return visibility;
 }
 
-template < class T >
+template < typename T >
 Visibility FrustumCuller< T >::_test( const vec4& plane, const vec3& middle,
                                       const vec3& extent ) const
 {
@@ -245,7 +245,7 @@ Visibility FrustumCuller< T >::_test( const vec4& plane, const vec3& middle,
     return VISIBILITY_NONE;
 }
 
-template < class T >
+template < typename T >
 Visibility FrustumCuller< T >::test( const AABB< T >& aabb ) const
 {
     Visibility result = VISIBILITY_FULL;

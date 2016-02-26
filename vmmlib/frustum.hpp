@@ -42,7 +42,7 @@ namespace vmml
 template< typename T > class Frustum
 {
 public:
-    /** Construct a default frustum */
+    /** Construct a default frustum (-1, 1, -1, 1, 0.1, 100). */
     Frustum();
 
     /** Construct a frustum with default values */
