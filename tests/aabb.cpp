@@ -27,6 +27,7 @@
  */
 
 #include <vmmlib/aabb.hpp>
+#include <vmmlib/types.hpp>
 
 #define BOOST_TEST_MODULE axisAlignedBoundingBox
 #include <boost/test/unit_test.hpp>

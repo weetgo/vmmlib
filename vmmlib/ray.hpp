@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014, Visualization and Multimedia Lab,
+ * Copyright (c) 2006-2016, Visualization and Multimedia Lab,
  *                          University of Zurich <http://vmml.ifi.uzh.ch>,
  *                          Eyescale Software GmbH,
  *                          Blue Brain Project, EPFL
@@ -37,53 +37,53 @@
  * (e.g. sphere)
  */
 
-#ifndef __VMML__INTERSECTION__HPP__
-#define __VMML__INTERSECTION__HPP__
+#ifndef __VMML__RAY__HPP__
+#define __VMML__RAY__HPP__
 
 #include <vmmlib/vector.hpp>
 
 namespace vmml
 {
-template< typename T > class intersection
+template< typename T > class Ray
 {
 public:
-    typedef vector< 3, T >    vec3;
-    typedef vector< 4, T >    vec4;
+    typedef vector< 3, T > vec3;
+    typedef vector< 4, T > vec4;
 
     /**
-      Constructors
-
-      @param[in]    origin      Ray origin
-      @param[in]    direction   Ray direction
+     * Constructor
+     *
+     * @param origin Ray origin
+     * @param direction Ray direction
      */
-    intersection( const vec3& origin, const vec3& direction )
+    Ray( const vec3& origin, const vec3& direction )
         : _origin ( origin )
         , _direction ( vmml::normalize( direction ))
     {}
-    ~intersection() {}
+    ~Ray() {}
 
     /**
-      Ray Sphere Intersection - Optimized solution
-      "Real-time Rendering 3rd Edition"
-
-      @param[in]    center      Sphere center
-      @param[in]    radius      Sphere radius
-      @param[out]   t           Intersection distance
-
-      @return Whether the ray intersects the sphere
+     * Ray-Sphere Intersection.
+     * Optimized solution from "Real-time Rendering 3rd Edition"
+     *
+     * @param center Sphere center
+     * @param radius Sphere radius
+     * @param distance Intersection distance
+     *
+     * @return The distance from the sphere center on intersection, or a
+     *         negative value if there is no intersection.
      */
-    bool test_sphere( const vec4& sphere, T& t ) const;
+    T test( const vec4& sphere ) const;
 
 private:
     const vec3 _origin;
     const vec3 _direction;
 
-}; // class intersection
+};
 
 
 template< typename T >
-bool
-intersection< T >::test_sphere( const vec4& sphere, T& t ) const
+T Ray< T >::test( const vec4& sphere ) const
 {
     const vec3 center = vec3(sphere.x(), sphere.y(), sphere.z());
     const T radius = sphere.w();
@@ -96,25 +96,22 @@ intersection< T >::test_sphere( const vec4& sphere, T& t ) const
 
     /** Sphere behind the ray origin and ray origin outside the sphere */
     if( vecProjection < 0 && sqDistance > sqRadius )
-        return false;
+        return -1.f;
 
     /** Squared distance from sphere center to the projection */
     const T sqCenterToProj = sqDistance - vecProjection * vecProjection;
 
     if( sqCenterToProj > sqRadius )
-        return false;
+        return -1.f;
 
     /** Distance from the sphere center to the surface along the ray direction*/
     const T distSurface = sqrt( sqRadius - sqCenterToProj );
 
     if(sqDistance > sqRadius)
-        t = vecProjection - distSurface;
-    else
-        t = vecProjection + distSurface;
+        return vecProjection - distSurface;
 
-    return true;
+    return vecProjection + distSurface;
 }
-
 
 } // namespace vmml
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014, Visualization and Multimedia Lab,
+ * Copyright (c) 2006-2016, Visualization and Multimedia Lab,
  *                          University of Zurich <http://vmml.ifi.uzh.ch>,
  *                          Eyescale Software GmbH,
  *                          Blue Brain Project, EPFL
@@ -33,13 +33,10 @@
 #ifndef __VMML__QUATERNION__HPP__
 #define __VMML__QUATERNION__HPP__
 
-#include <vmmlib/vector.hpp>
-#include <vmmlib/matrix.hpp>
-#include <vmmlib/math.hpp>
 #include <vmmlib/enable_if.hpp>
-
-#include <vmmlib/exception.hpp>
-#include <vmmlib/vmmlib_config.hpp>
+#include <vmmlib/math.hpp>
+#include <vmmlib/types.hpp>
+#include <vmmlib/vector.hpp> // base class
 
 #include <algorithm>
 #include <cassert>
@@ -57,8 +54,7 @@
 namespace vmml
 {
 
-template < typename T >
-class quaternion : private vector< 4, T >
+template < typename T > class quaternion : private vector< 4, T >
 {
 public:
     typedef vector< 4, T >  super;
@@ -111,7 +107,7 @@ public:
     bool operator!=( const vector< 4, T >& a ) const;
 
     bool is_akin( const quaternion& a,
-                 const T& delta = std::numeric_limits< T >::epsilon() );
+                  const T& delta = std::numeric_limits< T >::epsilon() );
 
     void conjugate();
     quaternion get_conjugate() const;
@@ -172,8 +168,9 @@ public:
     void normal( const quaternion& aa, const quaternion& bb, const quaternion& cc,  const quaternion& dd );
     quaternion normal( const quaternion& aa, const quaternion& bb, const quaternion& cc );
 
-    // to combine two rotations, multiply the respective quaternions before using rotate
-    // instead of rotating twice for increased performance, but be aware of non-commutativity!
+    // to combine two rotations, multiply the respective quaternions before
+    // using rotate instead of rotating twice for increased performance, but be
+    // aware of non-commutativity!
     void rotate( T theta, const vector< 3, T >& a );
     quaternion rotate( T theta, vector< 3, T >& axis, const vector< 3, T >& a );
     quaternion rotate_x( T theta, const vector< 3, T >& a );
@@ -205,14 +202,12 @@ public:
     static const quaternion QUATERK;
 
 }; // class quaternion
+}
 
-#ifndef VMMLIB_NO_TYPEDEFS
+#include <vmmlib/matrix.hpp>
 
-typedef quaternion< float >  Quaternionf;
-typedef quaternion< double > Quaterniond;
-
-#endif
-
+namespace vmml
+{
 // - implementation - //
 
 template < typename T >
@@ -666,9 +661,8 @@ quaternion< T >
 quaternion< T >::operator/( T a_ ) const
 {
     if ( a_ == 0.0 )
-    {
-        VMMLIB_ERROR( "Division by zero.", VMMLIB_HERE );
-    }
+        throw std::runtime_error( "Division by zero." );
+
     a_ = 1.0 / a_;
     return quaternion( x() * a_, y() * a_, z() * a_, w() * a_ );
 }
@@ -690,9 +684,8 @@ template < typename T >
 void quaternion< T >::operator/=( T q )
 {
     if ( q == 0.0 )
-    {
-        VMMLIB_ERROR( "Division by zero", VMMLIB_HERE );
-    }
+        throw std::runtime_error( "Division by zero" );
+
     q = 1.0f / q;
     this->operator*=( q );
 }
@@ -827,10 +820,10 @@ quaternion< T > quaternion< T >::normal( const quaternion< T >& aa,
     return tmp;
 }
 
-
-// to combine two rotations, multiply the respective quaternions before using rotate
-// instead of rotating twice for increased performance, but be aware of non-commutativity!
-// (the first rotation quaternion has to be the first factor)
+// to combine two rotations, multiply the respective quaternions before using
+// rotate instead of rotating twice for increased performance, but be aware of
+// non-commutativity!  (the first rotation quaternion has to be the first
+// factor)
 template< typename T >
 quaternion< T > quaternion< T >::rotate( T theta, vector< 3, T >& axis,
                                          const vector< 3, T >& a )
@@ -859,7 +852,7 @@ quaternion< T > quaternion< T >::rotate_y( T theta, const vector< 3, T >& a )
 {
     quaternion< T > p = a;
     T alpha = theta / 2;
-    quaternion< T > q = std::cos( alpha ) + ( std::sin( alpha ) *  QUATERJ );
+    quaternion< T > q( std::cos( alpha ) + ( std::sin( alpha ) *  QUATERJ ));
     return q * p * q.invert();
 }
 

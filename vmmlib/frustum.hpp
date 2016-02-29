@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014, Visualization and Multimedia Lab,
+ * Copyright (c) 2006-2016, Visualization and Multimedia Lab,
  *                          University of Zurich <http://vmml.ifi.uzh.ch>,
  *                          Eyescale Software GmbH,
  *                          Blue Brain Project, EPFL
@@ -33,76 +33,85 @@
 #ifndef __VMML__FRUSTUM__HPP__
 #define __VMML__FRUSTUM__HPP__
 
-#include <vmmlib/vmmlib_config.hpp>
-#include <vmmlib/matrix.hpp>
-
-#include <cmath>
-
-// - declaration -
+#include <vmmlib/matrix.hpp> // used inline
+#include <cstring> // memcmp
 
 namespace vmml
 {
-template< typename T > class frustum
+/** Represents a frustum, following OpenGL conventions. */
+template< typename T > class Frustum
 {
 public:
-    T array[6]; //!< left, right, bottom, top, near, far storage
+    /** Construct a default frustum (-1, 1, -1, 1, 0.1, 100). */
+    Frustum();
 
-    // contructors
-    frustum() : array() {} // http://stackoverflow.com/questions/5602030
-    frustum( const T left, const T right, const T bottom, const T top,
-             const T near_plane, const T far_plane );
+    /** Construct a frustum with default values */
+    Frustum( T left, T right, T bottom, T top, T nearPlane, T farPlane );
 
-    template< typename U > frustum( const frustum< U >& source_ );
+    /** Construct a frustum using gluPerspective semantics */
+    Frustum( T field_of_view_y, T aspect_ratio, T nearPlane_, T farPlane );
 
-    //the pointer 'values' must be a valid 6 component c array of the resp. type
-    template< typename U > frustum( const U* values );
+    /** Construct a frustum from a projection matrix */
+    Frustum( const matrix< 4, 4, T >& projection );
 
-    ~frustum();
+    /** Destruct this frustum */
+    ~Frustum() {}
 
-    frustum& operator=( const frustum& source_ );
-    template< typename U >
-    void operator=( const frustum< U >& source_ );
+    /** @return true if this and the other frustum are identical */
+    bool operator==( const Frustum< T >& other ) const;
 
-    void set( const T _left, const T _right, const T _bottom,
-        const T _top, const T _near, const T _far );
+    /** @return true if this and the other frustum are not identical */
+    bool operator!=( const Frustum< T >& other ) const;
 
-    // set the frustum using the same parameters as gluPerspective.
-    void set_perspective( T field_of_view_y, T aspect_ratio, T near_plane_,
-        T far_plane );
+    /** @return true if thw two frusta are identical withing the tolerance */
+    bool equals( const Frustum< T >& other,
+                 T tolerance = std::numeric_limits< T >::epsilon( )) const;
 
-    matrix< 4, 4, T > compute_matrix() const;
-    matrix< 4, 4, T > compute_ortho_matrix() const;
+    /** @return the perspective matrix for the given frustum. */
+    matrix< 4, 4, T > computePerspectiveMatrix() const;
 
-    void compute_matrix( matrix< 4, 4, T >& matrix_ ) const;
-    void compute_ortho_matrix( matrix< 4, 4, T >& matrix_ ) const;
-    void apply_jitter( const vector< 2, T >& jitter_ );
+    /** @return the orthographic matrix for the given frustum. */
+    matrix< 4, 4, T > computeOrthoMatrix() const;
 
-    // 'move' the frustum. this function changes the near_plane, and adjusts the
-    // other parameters in a way that the 'perspective pyramid' stays the same.
-    void adjust_near( const T near_plane );
+    /** Move the frustum near plane by the given offset "sideways" */
+    void jitter( const vector< 2, T >& jitter_ );
 
-    inline T& left();
-    inline const T& left() const;
+    /**
+     * Move the frustum near plane.
+     *
+     * Changes the position of the nearPlane, adjusting the other parameters in
+     * a way that the shape of the perspective pyramid stays the same.
+     */
+    void adjustNearPlane( const T nearPlane );
 
-    inline T& right();
-    inline const T& right() const;
+    /** @name Access to frustum corners */
+    //@{
+    T& left() { return _array[0]; }
+    T left() const { return _array[0]; }
 
-    inline T& bottom();
-    inline const T& bottom() const;
+    T& right() { return _array[1]; }
+    T right() const { return _array[1]; }
 
-    inline T& top();
-    inline const T& top() const;
+    T& bottom() { return _array[2]; }
+    T bottom() const { return _array[2]; }
 
-    inline T& near_plane();
-    inline const T& near_plane() const;
+    T& top() { return _array[3]; }
+    T top() const { return _array[3]; }
 
-    inline T& far_plane();
-    inline const T& far_plane() const;
+    T& nearPlane() { return _array[4]; }
+    T nearPlane() const { return _array[4]; }
 
-    inline T get_width() const;
-    inline T get_height() const;
+    T& farPlane() { return _array[5]; }
+    T farPlane() const { return _array[5]; }
+    //@}
 
-    friend std::ostream& operator << ( std::ostream& os, const frustum& f )
+    /** @return the width of this frustum at the near plane */
+    T getWidth() const;
+
+    /** @return the height of this frustum at the near plane */
+    T getHeight() const;
+
+    friend std::ostream& operator << ( std::ostream& os, const Frustum& f )
     {
         const std::ios::fmtflags flags = os.flags();
         const int                prec  = os.precision();
@@ -113,21 +122,16 @@ public:
            << std::setw(10) << f.right()  << " "
            << std::setw(10) << f.bottom() << " "
            << std::setw(10) << f.top()    << " "
-           << std::setw(10) << f.near_plane()   << " "
-           << std::setw(10) << f.far_plane()    << "]";
+           << std::setw(10) << f.nearPlane()   << " "
+           << std::setw(10) << f.farPlane()    << "]";
         os.precision( prec );
         os.setf( flags );
         return os;
     };
 
-    static const frustum DEFAULT;
+private:
+    T _array[6]; //!< left, right, bottom, top, near, far storage
 };
-
-#ifndef VMMLIB_NO_TYPEDEFS
-typedef frustum< float >  Frustumf;
-typedef frustum< double > Frustumd;
-#endif
-
 } // namespace vmml
 
 // - implementation - //
@@ -135,177 +139,109 @@ typedef frustum< double > Frustumd;
 namespace vmml
 {
 
-template< typename T >
-const frustum< T > frustum< T >::DEFAULT( static_cast< T >( -1.0 ),
-                                          static_cast< T >( 1.0 ),
-                                          static_cast< T >( -1.0 ),
-                                          static_cast< T >( 1.0 ),
-                                          static_cast< T >( 0.1 ),
-                                          static_cast< T >( 100.0 ) );
-
+template< typename T > Frustum< T >::Frustum()
+{
+    _array[0] = -1;
+    _array[1] = 1;
+    _array[2] = -1;
+    _array[3] = 1;
+    _array[4] = 0.1;
+    _array[5] = 100;
+}
 
 template < typename T >
-frustum<T>::frustum( const T _left, const T _right, const T _bottom,
+Frustum<T>::Frustum( const T _left, const T _right, const T _bottom,
                      const T _top, const T _near, const T _far )
 {
-    set( _left, _right, _bottom, _top, _near, _far );
+    _array[0] = _left;
+    _array[1] = _right;
+    _array[2] = _bottom;
+    _array[3] = _top;
+    _array[4] = _near;
+    _array[5] = _far;
 }
-
 
 template < typename T >
-template< typename U >
-frustum< T >::frustum( const frustum< U >& source_ )
+Frustum<T>::Frustum( const T fov_y, const T aspect_ratio, const T nearPlane_,
+                     const T farPlane_ )
 {
-    (*this) = source_;
+    _array[2] = std::tan( 0.5 * fov_y * M_PI / 180.0 ) * 0.5;
+    _array[3] = -_array[2];
+    // depend on _array[2,3]:
+    _array[0] = bottom() * aspect_ratio;
+    _array[1] = top() * aspect_ratio;
+    _array[4] = nearPlane_;
+    _array[5] = farPlane_;
 }
-
-
 
 template < typename T >
-template< typename U >
-frustum< T >::frustum( const U* values )
+Frustum<T>::Frustum( const matrix< 4, 4, T >& projection )
 {
-    assert( values &&
-            "frustum: Nullpointer argument as source for initialisation!" );
-    left()      = static_cast< T > ( values[0] );
-    right()     = static_cast< T > ( values[1] );
-    bottom()    = static_cast< T > ( values[2] );
-    top()       = static_cast< T > ( values[3] );
-    near_plane() = static_cast< T > ( values[4] );
-    far_plane()  = static_cast< T > ( values[5] );
+    _array[4] = projection( 2, 3 ) / (projection( 2, 2 ) - 1.0);
+    _array[5] = projection( 2, 3 ) / (projection( 2, 2 ) + 1.0);
+    _array[2] = nearPlane() * ( projection( 1, 2 ) - 1.0 ) / projection( 1, 1 );
+    _array[3] = nearPlane() * ( projection( 1, 2 ) + 1.0 ) / projection( 1, 1 );
+    _array[0] = nearPlane() * ( projection( 0, 2 ) - 1.0 ) / projection( 0, 0 );
+    _array[1] = nearPlane() * ( projection( 0, 2 ) + 1.0 ) / projection( 0, 0 );
 }
-
-
 
 template < typename T >
-frustum< T >::~frustum()
-{}
-
-
-
-template< typename T >
-frustum< T >& frustum< T >::operator=( const frustum& source_ )
+bool Frustum<T>::operator==( const Frustum< T >& other ) const
 {
-    memcpy( array, source_.array, 6 * sizeof( T ) );
-    return *this;
+    return ::memcmp( _array, other._array, sizeof( _array )) == 0;
 }
-
-template< typename T > template< typename U >
-void frustum< T >::operator = ( const frustum< U >& source_ )
-{
-    for( size_t index = 0; index < 6; ++index )
-    {
-        array[ index ] = static_cast< T >( source_.array[ index ] );
-    }
-}
-
-
 
 template < typename T >
-void
-frustum< T >::set( const T _left, const T _right, const T _bottom,
-    const T _top, const T _near, const T _far )
+bool Frustum<T>::operator!=( const Frustum< T >& other ) const
 {
-    left()      = _left;
-    right()     = _right;
-    bottom()    = _bottom;
-    top()       = _top;
-    near_plane() = _near;
-    far_plane()  = _far;
+    return ::memcmp( _array, other._array, sizeof( _array )) != 0;
 }
 
-
-// 'move' the frustum. this function changes the near_plane, and adjusts the
-// other parameters in a way that the 'perspective pyramid' stays the same.
 template < typename T >
-void
-frustum<T>::adjust_near( const T new_near )
+bool Frustum<T>::equals( const Frustum< T >& other, const T tolerance ) const
 {
-	if( new_near == near_plane() )
-		return;
-
-	const T ratio = new_near / near_plane();
-	right()     *= ratio;
-	left()      *= ratio;
-	top()       *= ratio;
-	bottom()    *= ratio;
-	near_plane()  = new_near;
+    return std::abs( _array[0] - other._array[0] ) <= tolerance &&
+           std::abs( _array[1] - other._array[1] ) <= tolerance &&
+           std::abs( _array[2] - other._array[2] ) <= tolerance &&
+           std::abs( _array[3] - other._array[3] ) <= tolerance &&
+           std::abs( _array[4] - other._array[4] ) <= tolerance &&
+           std::abs( _array[5] - other._array[5] ) <= tolerance;
 }
 
-
-
-// set the frustum using the same parameters as gluPerspective.
 template < typename T >
-void
-frustum<T>::set_perspective( T fov_y, T aspect_ratio, T near_plane_,
-    T far_plane_ )
+matrix< 4, 4, T > Frustum<T>::computePerspectiveMatrix() const
 {
-    near_plane() = near_plane_;
-    far_plane()   = far_plane_;
+    matrix< 4, 4, T > M;
 
-    top()       = tan( 0.5 * fov_y * M_PI / 180.0 ) * 0.5;
-    bottom()    = - top();
-
-    left()      = bottom() * aspect_ratio;
-    right()     = top() * aspect_ratio;
-}
-
-
-
-template < typename T >
-matrix< 4, 4, T >
-frustum<T>::compute_matrix() const
-{
-    matrix< 4, 4, T > matrix_;
-    compute_matrix( matrix_ );
-    return matrix_;
-}
-
-
-
-template < typename T >
-void
-frustum<T>::compute_matrix( matrix< 4, 4, T >& M ) const
-{
-    M( 0,0 ) = 2.0 * near_plane() / ( right() - left() );
+    M( 0,0 ) = 2.0 * nearPlane() / ( right() - left() );
     M( 0,1 ) = 0.0;
     M( 0,2 ) = ( right() + left() ) / ( right() - left() );
     M( 0,3 ) = 0.0;
 
     M( 1,0 ) = 0.0;
-    M( 1,1 ) = 2.0 * near_plane() / ( top() - bottom() );
+    M( 1,1 ) = 2.0 * nearPlane() / ( top() - bottom() );
     M( 1,2 ) = ( top() + bottom() ) / ( top() - bottom() );
     M( 1,3 ) = 0.0;
 
     M( 2,0 ) = 0.0;
     M( 2,1 ) = 0.0;
     // NOTE: Some glfrustum man pages say wrongly '(far + near) / (far - near)'
-    M( 2,2 ) = -( far_plane() + near_plane() ) / ( far_plane() - near_plane() );
-    M( 2,3 ) = -2.0 * far_plane() * near_plane() / ( far_plane() - near_plane() );
+    M( 2,2 ) = -( farPlane() + nearPlane() ) / ( farPlane() - nearPlane( ));
+    M( 2,3 ) = -2.0 * farPlane() * nearPlane() / (farPlane() - nearPlane());
 
     M( 3,0 ) = 0.0;
     M( 3,1 ) = 0.0;
     M( 3,2 ) = -1.0;
     M( 3,3 ) =  0.0;
+
+    return M;
 }
 
-
-
 template < typename T >
-matrix< 4, 4, T >
-frustum< T >::compute_ortho_matrix() const
+matrix< 4, 4, T > Frustum< T >::computeOrthoMatrix() const
 {
-    matrix< 4, 4, T > matrix_;
-    compute_ortho_matrix( matrix_ );
-    return matrix_;
-}
+    matrix< 4, 4, T > M;
 
-
-
-template < typename T >
-void
-frustum< T >::compute_ortho_matrix( matrix< 4, 4, T >& M ) const
-{
     M( 0,0 ) = 2.0 / ( right() - left() );
     M( 0,1 ) = 0.0;
     M( 0,2 ) = 0.0;
@@ -318,17 +254,19 @@ frustum< T >::compute_ortho_matrix( matrix< 4, 4, T >& M ) const
 
     M( 2,0 ) = 0.0;
     M( 2,1 ) = 0.0;
-    M( 2,2 ) = -2.0 / ( far_plane() - near_plane() );
-    M( 2,3 ) = -( far_plane() + near_plane() ) / ( far_plane() - near_plane() );
+    M( 2,2 ) = -2.0 / ( farPlane() - nearPlane() );
+    M( 2,3 ) = -( farPlane() + nearPlane() ) / ( farPlane() - nearPlane() );
 
     M( 3,0 ) = 0.0;
     M( 3,1 ) = 0.0;
     M( 3,2 ) = 0.0;
     M( 3,3 ) = 1.0f;
+
+    return M;
 }
 
 template < typename T >
-void frustum< T >::apply_jitter( const vector< 2, T >& jitter_ )
+void Frustum< T >::jitter( const vector< 2, T >& jitter_ )
 {
     left()   = left() + jitter_.x();
     right()  = right() + jitter_.x();
@@ -336,86 +274,27 @@ void frustum< T >::apply_jitter( const vector< 2, T >& jitter_ )
     top()    = top() + jitter_.y();
 }
 
-template< typename T >
-inline T& frustum< T >::left()
+template < typename T > void Frustum<T>::adjustNearPlane( const T new_near )
 {
-    return array[ 0 ];
+	if( new_near == nearPlane() )
+		return;
+
+	const T ratio = new_near / nearPlane();
+	right()     *= ratio;
+	left()      *= ratio;
+	top()       *= ratio;
+	bottom()    *= ratio;
+	nearPlane()  = new_near;
 }
 
-template< typename T >
-inline const T& frustum< T >::left() const
+template< typename T > inline T Frustum< T >::getWidth() const
 {
-    return array[ 0 ];
+    return std::abs( right() - left( ));
 }
 
-template< typename T >
-inline T& frustum< T >::right()
+template< typename T > inline T Frustum< T >::getHeight() const
 {
-    return array[ 1 ];
-}
-
-template< typename T >
-inline const T& frustum< T >::right() const
-{
-    return array[ 1 ];
-}
-
-template< typename T >
-inline T& frustum< T >::bottom()
-{
-    return array[ 2 ];
-}
-
-template< typename T >
-inline const T& frustum< T >::bottom() const
-{
-    return array[ 2 ];
-}
-
-template< typename T >
-inline T& frustum< T >::top()
-{
-    return array[ 3 ];
-}
-
-template< typename T >
-inline const T& frustum< T >::top() const
-{
-    return array[ 3 ];
-}
-
-template< typename T >
-inline T& frustum< T >::near_plane()
-{
-    return array[ 4 ];
-}
-
-template< typename T >
-inline const T& frustum< T >::near_plane() const
-{
-    return array[ 4 ];
-}
-
-template< typename T >
-inline T& frustum< T >::far_plane()
-{
-    return array[ 5 ];
-}
-
-template< typename T >
-inline const T& frustum< T >::far_plane() const
-{
-    return array[ 5 ];
-}
-
-template< typename T > inline T frustum< T >::get_width() const
-{
-    return fabs( right() - left( ));
-}
-
-template< typename T > inline T frustum< T >::get_height() const
-{
-    return fabs( top() - bottom( ));
+    return std::abs( top() - bottom( ));
 }
 
 

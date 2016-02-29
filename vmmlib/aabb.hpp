@@ -35,6 +35,8 @@
 #include <vmmlib/vector.hpp>
 #include <limits>
 
+namespace lunchbox { template< class T > void byteswap( T& ); }
+
 namespace vmml
 {
 /**
@@ -65,11 +67,9 @@ public:
 
     /** @return the minimum corner point */
     const vector< 3, T >& getMin() const;
-    vector< 3, T >& getMin();
 
     /** @return the maximum corner point */
     const vector< 3, T >& getMax() const;
-    vector< 3, T >& getMax();
 
     /** Create the union of this and the given bounding box */
     void merge( const AABB< T >& aabb );
@@ -105,13 +105,11 @@ public:
     /** @return a bouding box of size one with the minimum point at zero. */
     static AABB< T > makeUnitBox();
 
-protected:
+private:
     vector< 3, T > _min;
     vector< 3, T > _max;
+    template< class U > friend void lunchbox::byteswap( U& );
 };
-
-typedef AABB< float >  AABBf; //!< A float bounding box
-typedef AABB< double > AABBd; //!< A double bounding box
 
 template< typename T > inline
 std::ostream& operator << ( std::ostream& os, const AABB< T >& aabb )
@@ -136,8 +134,12 @@ template<> inline AABB< double >::AABB()
 
 template< typename T >
 AABB< T >::AABB( const vector< 3, T >& pMin, const vector< 3, T >& pMax)
-    : _min( pMin )
-    , _max( pMax )
+    : _min( vector< 3, T >( std::min( pMin[0], pMax[0] ),
+                            std::min( pMin[1], pMax[1] ),
+                            std::min( pMin[2], pMax[2] )))
+    , _max( vector< 3, T >( std::max( pMin[0], pMax[0] ),
+                            std::max( pMin[1], pMax[1] ),
+                            std::max( pMin[2], pMax[2] )))
 {}
 
 template< typename T > AABB< T >::AABB( const vector< 4, T >& sphere )
@@ -180,16 +182,6 @@ template< typename T > inline const vector< 3, T >& AABB< T >::getMax() const
     return _max;
 }
 
-template< typename T > inline vector< 3, T >& AABB< T >::getMin()
-{
-    return _min;
-}
-
-template< typename T > inline vector< 3, T >& AABB< T >::getMax()
-{
-    return _max;
-}
-
 template< typename T > inline
 bool AABB< T >::operator==( const AABB< T >& other ) const
 {
@@ -204,7 +196,7 @@ bool AABB< T >::operator!=( const AABB< T >& other ) const
 
 template< typename T > vector< 3, T > AABB< T >::getCenter() const
 {
-    return _min + ( ( _max - _min ) * 0.5f );
+    return ( _min + _max ) * 0.5f;
 }
 
 template< typename T > vector< 3, T > AABB< T >::getSize() const

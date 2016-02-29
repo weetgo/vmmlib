@@ -33,10 +33,8 @@
 #ifndef __VMML__VECTOR__HPP__
 #define __VMML__VECTOR__HPP__
 
-#include <vmmlib/vmmlib_config.hpp>
 #include <vmmlib/math.hpp>
 #include <vmmlib/enable_if.hpp>
-#include <vmmlib/exception.hpp>
 
 #include <algorithm>
 #include <cstring>
@@ -49,9 +47,7 @@
 
 namespace vmml
 {
-
-template< size_t M, typename T = float >
-class vector
+template< size_t M, typename T > class vector
 {
 public:
     typedef T                                       value_type;
@@ -144,7 +140,7 @@ public:
     bool operator==( const vector& other ) const;
     bool operator!=( const vector& other ) const;
     bool equals( const vector& other,
-                 T tolerance = std::numeric_limits< T >::epsilon() ) const;
+                 T tolerance = std::numeric_limits< T >::epsilon( )) const;
     bool operator<( const vector& other ) const;
 
     // remember kids: c_arrays are dangerous and evil!
@@ -383,25 +379,6 @@ template< size_t M, typename T >
 const vector< M, T > vector< M, T >::UNIT_Z( 0, 0, 1 );
 #endif
 
-#ifndef VMMLIB_NO_TYPEDEFS
-#  ifdef _MSC_VER
-     typedef UINT8 uint8_t;
-#  endif
-typedef vmml::vector< 2, int > Vector2i;
-typedef vmml::vector< 3, int > Vector3i;
-typedef vmml::vector< 4, int > Vector4i;
-typedef vmml::vector< 2, unsigned > Vector2ui;
-typedef vmml::vector< 3, unsigned > Vector3ui;
-typedef vmml::vector< 4, unsigned > Vector4ui;
-typedef vmml::vector< 3, double > Vector3d;
-typedef vmml::vector< 4, double > Vector4d;
-typedef vmml::vector< 2, float > Vector2f;
-typedef vmml::vector< 3, float > Vector3f;
-typedef vmml::vector< 4, float > Vector4f;
-typedef vmml::vector< 3, uint8_t > Vector3ub;
-typedef vmml::vector< 4, uint8_t > Vector4ub;
-#endif
-
 //
 //  some free functions for convenience
 //
@@ -631,12 +608,8 @@ template< size_t M, typename T >
 inline T&
 vector< M, T >::at( size_t index )
 {
-    #ifdef VMMLIB_SAFE_ACCESSORS
-    if ( index >= M )
-    {
-        VMMLIB_ERROR( "at() - index out of bounds", VMMLIB_HERE );
-    }
-    #endif
+    if( index >= M )
+        throw std::runtime_error( "at() - index out of bounds" );
     return array[ index ];
 }
 
@@ -644,12 +617,8 @@ template< size_t M, typename T >
 inline const T&
 vector< M, T >::at( size_t index ) const
 {
-    #ifdef VMMLIB_SAFE_ACCESSORS
     if ( index >= M )
-    {
-        VMMLIB_ERROR( "at() - index out of bounds", VMMLIB_HERE );
-    }
-    #endif
+        throw std::runtime_error( "at() - index out of bounds" );
     return array[ index ];
 }
 

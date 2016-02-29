@@ -28,6 +28,7 @@
 
 #include <vmmlib/vector.hpp>
 #include <vmmlib/math.hpp>
+#include <vmmlib/types.hpp>
 
 #define BOOST_TEST_MODULE vector
 #include <boost/test/unit_test.hpp>

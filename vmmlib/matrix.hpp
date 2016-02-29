@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014, Visualization and Multimedia Lab,
+ * Copyright (c) 2006-2016, Visualization and Multimedia Lab,
  *                          University of Zurich <http://vmml.ifi.uzh.ch>,
  *                          Eyescale Software GmbH,
  *                          Blue Brain Project, EPFL
@@ -32,13 +32,10 @@
 #ifndef __VMML__MATRIX__HPP__
 #define __VMML__MATRIX__HPP__
 
-#include <vmmlib/vmmlib_config.hpp>
-
-#include <vmmlib/matrix_functors.hpp>
-#include <vmmlib/vector.hpp>
-#include <vmmlib/math.hpp>
-#include <vmmlib/exception.hpp>
 #include <vmmlib/enable_if.hpp>
+#include <vmmlib/math.hpp>
+#include <vmmlib/matrix_functors.hpp>
+#include <vmmlib/types.hpp>
 
 #include <iostream>
 #include <iomanip>
@@ -54,8 +51,7 @@ namespace vmml
 {
 
 // matrix of type T with m rows and n columns
-template< size_t M, size_t N, typename T >
-class matrix
+template< size_t M, size_t N, typename T > class matrix
 {
 public:
     typedef T                                       value_type;
@@ -81,6 +77,14 @@ public:
 
     template< size_t P, size_t Q, typename U >
     matrix( const matrix< P, Q, U >& source_ );
+
+    /**
+     * Construct a new transformation matrix from a rotation quaternion and a
+     * translation vector.
+     */
+    template< size_t O >
+    matrix( const quaternion< T >& rotation, const vector< O, T >& translation,
+            typename enable_if< M == O+1 && N == O+1 && O == 3 >::type* = 0 );
 
     // accessors
     inline T& operator()( size_t row_index, size_t col_index );
@@ -111,11 +115,8 @@ public:
 
     // due to limited precision, two 'identical' matrices might seem different.
     // this function allows to specify a tolerance when comparing matrices.
-    bool equals( const matrix& other, T tolerance ) const;
-    // this version takes a comparison functor to compare the components of
-    // the two matrices
-    template< typename compare_t >
-    bool equals( const matrix& other, compare_t& cmp ) const;
+    bool equals( const matrix& other,
+                 T tolerance = std::numeric_limits< T >::epsilon( )) const;
 
     void multiply_piecewise( const matrix& other );
 
@@ -418,37 +419,30 @@ public:
     struct row_accessor
     {
         row_accessor( T* array_ ) : array( array_ ) {}
-        T&
-        operator[]( size_t col_index )
+        T& operator[]( const size_t col_index )
         {
-            #ifdef VMMLIB_SAFE_ACCESSORS
             if ( col_index >= N )
-                VMMLIB_ERROR( "column index out of bounds", VMMLIB_HERE );
-            #endif
+                throw std::runtime_error( "column index out of bounds" );
             return array[ col_index * M ];
         }
 
-        const T&
-        operator[]( size_t col_index ) const
+        const T& operator[]( const size_t col_index ) const
         {
-            #ifdef VMMLIB_SAFE_ACCESSORS
             if ( col_index >= N )
-                VMMLIB_ERROR( "column index out of bounds", VMMLIB_HERE );
-            #endif
+                throw std::runtime_error( "column index out of bounds" );
             return array[ col_index * M ];
         }
 
+    private:
+        row_accessor() {} // disallow std ctor
         T* array;
-        private: row_accessor() {} // disallow std ctor
     };
     // this is a hack to allow array-style access to matrix elements
     // usage: matrix< 2, 2, float > m; m[ 1 ][ 0 ] = 37.0f;
-    inline row_accessor operator[]( size_t row_index )
+    inline row_accessor operator[]( const size_t row_index )
     {
-        #ifdef VMMLIB_SAFE_ACCESSORS
         if ( row_index > M )
-            VMMLIB_ERROR( "row index out of bounds", VMMLIB_HERE );
-        #endif
+            throw std::runtime_error( "row index out of bounds" );
         return row_accessor( array + row_index );
     }
 
@@ -489,27 +483,16 @@ public:
     static const matrix< M, N, T > ZERO;
 
 }; // class matrix
-
-
-#ifndef VMMLIB_NO_TYPEDEFS
-typedef vmml::matrix< 3, 3, double > Matrix3d; //!< A 3x3 double matrix
-typedef vmml::matrix< 4, 4, double > Matrix4d; //!< A 4x4 double matrix
-typedef vmml::matrix< 3, 3, float >  Matrix3f; //!< A 3x3 float matrix
-typedef vmml::matrix< 4, 4, float >  Matrix4f; //!< A 4x4 float matrix
-#endif
-
-/*
-*   free functions
-*/
-
-template< size_t M, size_t N, typename T >
-bool equals( const matrix< M, N, T >& m0, const matrix< M, N, T >& m1,
-             const T tolerance = std::numeric_limits< T >::epsilon())
-{
-    return m0.equals( m1, tolerance );
 }
 
+#include <vmmlib/quaternion.hpp>
+#include <vmmlib/vector.hpp>
 
+namespace vmml
+{
+/*
+ *   free functions
+ */
 template< size_t M, size_t N, typename T >
 inline void multiply( const matrix< M, N, T >& left,
                       const matrix< M, N, T >& right,
@@ -842,13 +825,25 @@ matrix< M, N, T >::matrix( const matrix< P, Q, U >& source_ )
     (*this) = source_;
 }
 
+template< size_t M, size_t N, typename T > template< size_t O >
+matrix< M, N, T >::matrix( const quaternion< T >& rotation,
+                           const vector< O, T >& translation,
+               typename enable_if< M == O+1 && N == O+1 && O == 3 >::type* )
+{
+    rotation.get_rotation_matrix( *this );
+    set_translation( translation );
+    at( 3, 0 ) = 0;
+    at( 3, 1 ) = 0;
+    at( 3, 2 ) = 0;
+    at( 3, 3 ) = 1;
+}
 
 template< size_t M, size_t N, typename T >
 inline T& matrix< M, N, T >::at( size_t row_index, size_t col_index )
 {
 #ifdef VMMLIB_SAFE_ACCESSORS
     if ( row_index >= M || col_index >= N )
-        VMMLIB_ERROR( "at( row, col ) - index out of bounds", VMMLIB_HERE );
+        throw std::runtime_error( "at( row, col ) - index out of bounds" );
 #endif
     return array[ col_index * M + row_index ];
 }
@@ -861,7 +856,7 @@ matrix< M, N, T >::at( size_t row_index, size_t col_index ) const
 {
 #ifdef VMMLIB_SAFE_ACCESSORS
     if ( row_index >= M || col_index >= N )
-        VMMLIB_ERROR( "at( row, col ) - index out of bounds", VMMLIB_HERE );
+        throw std::runtime_error( "at( row, col ) - index out of bounds" );
 #endif
     return array[ col_index * M + row_index ];
 }
@@ -931,42 +926,19 @@ operator!=( const matrix< M, N, T >& other ) const
 
 
 template< size_t M, size_t N, typename T >
-bool
-matrix< M, N, T >::
-equals( const matrix< M, N, T >& other, T tolerance ) const
+bool matrix< M, N, T >::equals( const matrix< M, N, T >& other,
+                                const T tolerance ) const
 {
-    bool is_ok = true;
-    for( size_t row_index = 0; is_ok && row_index < M; row_index++)
-    {
-        for( size_t col_index = 0; is_ok && col_index < N; col_index++)
-        {
-            is_ok = fabs( at( row_index, col_index ) - other( row_index, col_index ) ) < tolerance;
-        }
-    }
-    return is_ok;
+    for( size_t row_index = 0; row_index < M; row_index++)
+        for( size_t col_index = 0; col_index < N; col_index++)
+            if( std::abs( at( row_index, col_index ) -
+                          other( row_index, col_index )) > tolerance )
+            {
+                return false;
+            }
+    return true;
 }
 
-
-
-template< size_t M, size_t N, typename T >
-template< typename compare_t >
-bool matrix< M, N, T >::equals( const matrix< M, N, T >& other_matrix,
-                                compare_t& cmp ) const
-{
-    bool is_ok = true;
-    for( size_t row = 0; is_ok && row < M; ++row )
-    {
-        for( size_t col = 0; is_ok && col < N; ++col)
-        {
-            is_ok = cmp( at( row, col ), other_matrix.at( row, col ) );
-        }
-    }
-    return is_ok;
-}
-
-#if (( __GNUC__ > 4 ) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) )
-#  pragma GCC diagnostic ignored "-Warray-bounds" // gcc 4.4.7 bug WAR
-#endif
 template< size_t M, size_t N, typename T >
 const matrix< M, N, T >&
 matrix< M, N, T >::operator=( const matrix< M, N, T >& source_ )
@@ -974,9 +946,6 @@ matrix< M, N, T >::operator=( const matrix< M, N, T >& source_ )
     memcpy( array, source_.array, M * N * sizeof( T ));
     return *this;
 }
-#if (( __GNUC__ > 4 ) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) )
-#  pragma GCC diagnostic warning "-Warray-bounds"
-#endif
 
 template< size_t M, size_t N, typename T >
 template< size_t P, size_t Q, typename U >
@@ -1025,7 +994,7 @@ void
 matrix< M, N, T >::operator=( const std::vector< T >& data )
 {
     if ( data.size() < M * N )
-        VMMLIB_ERROR( "index out of bounds.", VMMLIB_HERE );
+        throw std::runtime_error( "index out of bounds." );
 
     set( data.begin(), data.end(), true );
 }
@@ -1316,11 +1285,8 @@ vector< M, T > matrix< M, N, T >::get_column( size_t index ) const
 template< size_t M, size_t N, typename T >
 void matrix< M, N, T >::get_column( size_t index, vector< M, T >& column ) const
 {
-#ifdef VMMLIB_SAFE_ACCESSORS
     if ( index >= N )
-        VMMLIB_ERROR( "get_column() - index out of bounds.", VMMLIB_HERE );
-#endif
-
+        throw std::runtime_error( "get_column() - index out of bounds." );
     memcpy( &column.array[0], &array[ M * index ], M * sizeof( T ) );
 }
 
@@ -1329,13 +1295,8 @@ void matrix< M, N, T >::get_column( size_t index, vector< M, T >& column ) const
 template< size_t M, size_t N, typename T >
 void matrix< M, N, T >::set_column( size_t index, const vector< M, T >& column )
 {
-    #ifdef VMMLIB_SAFE_ACCESSORS
-
     if ( index >= N )
-        VMMLIB_ERROR( "set_column() - index out of bounds.", VMMLIB_HERE );
-
-    #endif
-
+        throw std::runtime_error( "set_column() - index out of bounds." );
     memcpy( array + M * index, column.array, M * sizeof( T ) );
 }
 
@@ -1343,11 +1304,8 @@ template< size_t M, size_t N, typename T >
 void matrix< M, N, T >::get_column( size_t index, matrix< M, 1, T >& column )
     const
 {
-#ifdef VMMLIB_SAFE_ACCESSORS
     if ( index >= N )
-        VMMLIB_ERROR( "get_column() - index out of bounds.", VMMLIB_HERE );
-#endif
-
+        throw std::runtime_error( "get_column() - index out of bounds." );
     memcpy( column.array, array + M * index, M * sizeof( T ) );
 }
 
@@ -1355,11 +1313,8 @@ template< size_t M, size_t N, typename T >
 void matrix< M, N, T >::set_column( size_t index,
                                     const matrix< M, 1, T >& column )
 {
-#ifdef VMMLIB_SAFE_ACCESSORS
     if ( index >= N )
-        VMMLIB_ERROR( "set_column() - index out of bounds.", VMMLIB_HERE );
-#endif
-
+        throw std::runtime_error( "set_column() - index out of bounds." );
     memcpy( &array[ M * index ], column.array, M * sizeof( T ) );
 }
 
@@ -1374,80 +1329,56 @@ vector< N, T > matrix< M, N, T >::get_row( size_t index ) const
 template< size_t M, size_t N, typename T >
 void matrix< M, N, T >::get_row( size_t row_index, vector< N, T >& row ) const
 {
-#ifdef VMMLIB_SAFE_ACCESSORS
     if ( row_index >= M )
-        VMMLIB_ERROR( "get_row() - index out of bounds.", VMMLIB_HERE );
-#endif
+        throw std::runtime_error( "get_row() - index out of bounds." );
 
     for( size_t col_index = 0; col_index < N; ++col_index )
-    {
         row.at( col_index ) = at( row_index, col_index );
-    }
 }
 
 template< size_t M, size_t N, typename T >
 void matrix< M, N, T >::set_row( size_t row_index, const vector< N, T >& row )
 {
-#ifdef VMMLIB_SAFE_ACCESSORS
     if ( row_index >= M )
-        VMMLIB_ERROR( "set_row() - index out of bounds.", VMMLIB_HERE );
-#endif
+        throw std::runtime_error( "set_row() - index out of bounds." );
 
     for( size_t col_index = 0; col_index < N; ++col_index )
-    {
         at( row_index, col_index ) = row.at( col_index );
-    }
 }
 
 template< size_t M, size_t N, typename T >
 void matrix< M, N, T >::get_row( size_t row_index, matrix< 1, N, T >& row )
     const
 {
-#ifdef VMMLIB_SAFE_ACCESSORS
     if ( row_index >= M )
-        VMMLIB_ERROR( "get_row() - index out of bounds.", VMMLIB_HERE );
-#endif
+        throw std::runtime_error( "get_row() - index out of bounds." );
 
     for( size_t col_index = 0; col_index < N; ++col_index )
-    {
         row.at( 0, col_index ) = at( row_index, col_index );
-    }
 }
 
 template< size_t M, size_t N, typename T >
 void matrix< M, N, T >::set_row( size_t row_index,
                                  const matrix< 1, N, T >& row )
 {
-#ifdef VMMLIB_SAFE_ACCESSORS
     if ( row_index >= M )
-        VMMLIB_ERROR( "set_row() - index out of bounds.", VMMLIB_HERE );
-#endif
+        throw std::runtime_error( "set_row() - index out of bounds." );
 
     for( size_t col_index = 0; col_index < N; ++col_index )
-    {
         at( row_index, col_index ) = row.at( 0, col_index );
-    }
 }
 
 template< size_t M, size_t N, typename T >
-size_t
-matrix< M, N, T >::
-get_number_of_rows() const
+size_t matrix< M, N, T >::get_number_of_rows() const
 {
     return M;
 }
 
-
-
 template< size_t M, size_t N, typename T >
-size_t
-matrix< M, N, T >::
-get_number_of_columns() const
+size_t matrix< M, N, T >::get_number_of_columns() const
 {
     return N;
 }
-
-
 
 template< size_t M, size_t N, typename T >
 void
@@ -1650,7 +1581,7 @@ get_sub_matrix( matrix< O, P, T >& result,
 {
     #ifdef VMMLIB_SAFE_ACCESSORS
     if ( O + row_offset > M || P + col_offset > N )
-        VMMLIB_ERROR( "index out of bounds.", VMMLIB_HERE );
+        throw std::runtime_error( "index out of bounds." );
     #endif
 
     for( size_t row = 0; row < O; ++row )

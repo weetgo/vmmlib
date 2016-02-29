@@ -19,7 +19,7 @@ both in open source and commercial closed source software.
 
 VMMLib provides the following major classes:
 * Basic matrix math: vmml::vector, vmml::quaternion, vmml::matrix
-* OpenGL math: vmml::frustum, vmml::frustum_culler, vmml::AABB
+* OpenGL math: vmml::Frustum, vmml::FrustumCuller, vmml::AABB
 * Detailed @ref Changelog
 
 # Bugs {#Bugs}
