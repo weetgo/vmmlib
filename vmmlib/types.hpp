@@ -45,7 +45,7 @@ template< size_t M, typename T > class vector;
 template < typename T > class quaternion;
 template< typename T > class AABB;
 template< typename T > class Frustum;
-template< class T > class FrustumCuller;
+template< typename T > class FrustumCuller;
 
 typedef matrix< 3, 3, double > Matrix3d; //!< A 3x3 double matrix
 typedef matrix< 4, 4, double > Matrix4d; //!< A 4x4 double matrix
