@@ -1106,8 +1106,7 @@ bool vector< M, T >::operator!=( const vector< M, T >& other ) const
 }
 
 template< size_t M, typename T >
-bool
-vector< M, T >::equals( const vector< M, T >& other, T tolerance ) const
+bool vector< M, T >::equals( const vector< M, T >& other, T tolerance ) const
 {
     for( size_t index = 0; index < M; ++index )
         if( fabs( at( index ) - other( index ) ) >= tolerance )

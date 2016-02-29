@@ -29,6 +29,7 @@
 #ifndef __VMML__VMMLIB_TYPES__HPP__
 #define __VMML__VMMLIB_TYPES__HPP__
 
+#include <sys/types.h>
 #ifdef _MSC_VER
 #  ifndef HAVE_SSIZE_T
 #    include <basetsd.h>
@@ -36,6 +37,8 @@ typedef SSIZE_T ssize_t;
 #    define HAVE_SSIZE_T
 #  endif
 typedef UINT8 uint8_t;
+#else
+#  include <stdint.h>
 #endif
 
 namespace vmml
