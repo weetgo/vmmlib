@@ -6,12 +6,12 @@ set(VMMLIB_PUBLIC_HEADERS
   enable_if.hpp
   frustum.hpp
   frustumCuller.hpp
-  intersection.hpp
   lowpass_filter.hpp
   math.hpp
   matrix.hpp
   matrix_functors.hpp
   quaternion.hpp
+  ray.hpp
   types.hpp
   util.hpp
   vector.hpp

@@ -46,6 +46,7 @@ template < typename T > class quaternion;
 template< typename T > class AABB;
 template< typename T > class Frustum;
 template< typename T > class FrustumCuller;
+template< typename T > class Ray;
 
 typedef matrix< 3, 3, double > Matrix3d; //!< A 3x3 double matrix
 typedef matrix< 4, 4, double > Matrix4d; //!< A 4x4 double matrix
@@ -77,6 +78,10 @@ typedef FrustumCuller< double > FrustumCullerd; //!< A double frustum culler
 
 typedef AABB< float >  AABBf; //!< A float bounding box
 typedef AABB< double > AABBd; //!< A double bounding box
+
+typedef vmml::Ray< float > Rayf; //!< A float ray
+typedef vmml::Ray< double > Rayd; //!< A double ray
+
 }
 
 #endif

@@ -37,14 +37,14 @@
  * (e.g. sphere)
  */
 
-#ifndef __VMML__INTERSECTION__HPP__
-#define __VMML__INTERSECTION__HPP__
+#ifndef __VMML__RAY__HPP__
+#define __VMML__RAY__HPP__
 
 #include <vmmlib/vector.hpp>
 
 namespace vmml
 {
-template< typename T > class Intersection
+template< typename T > class Ray
 {
 public:
     typedef vector< 3, T > vec3;
@@ -56,11 +56,11 @@ public:
      * @param origin Ray origin
      * @param direction Ray direction
      */
-    Intersection( const vec3& origin, const vec3& direction )
+    Ray( const vec3& origin, const vec3& direction )
         : _origin ( origin )
         , _direction ( vmml::normalize( direction ))
     {}
-    ~Intersection() {}
+    ~Ray() {}
 
     /**
      * Ray-Sphere Intersection.
@@ -83,7 +83,7 @@ private:
 
 
 template< typename T >
-T Intersection< T >::test( const vec4& sphere ) const
+T Ray< T >::test( const vec4& sphere ) const
 {
     const vec3 center = vec3(sphere.x(), sphere.y(), sphere.z());
     const T radius = sphere.w();
