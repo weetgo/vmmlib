@@ -6,8 +6,7 @@ set(VMMLIB_PUBLIC_HEADERS
   enable_if.hpp
   frustum.hpp
   frustumCuller.hpp
-  lowpass_filter.hpp
-  math.hpp
+  lowpassFilter.hpp
   matrix.hpp
   matrix_functors.hpp
   quaternion.hpp

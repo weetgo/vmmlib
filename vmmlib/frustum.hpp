@@ -52,7 +52,7 @@ public:
     Frustum( T field_of_view_y, T aspect_ratio, T nearPlane_, T farPlane );
 
     /** Construct a frustum from a projection matrix */
-    Frustum( const matrix< 4, 4, T >& projection );
+    Frustum( const Matrix< 4, 4, T >& projection );
 
     /** Destruct this frustum */
     ~Frustum() {}
@@ -68,10 +68,10 @@ public:
                  T tolerance = std::numeric_limits< T >::epsilon( )) const;
 
     /** @return the perspective matrix for the given frustum. */
-    matrix< 4, 4, T > computePerspectiveMatrix() const;
+    Matrix< 4, 4, T > computePerspectiveMatrix() const;
 
     /** @return the orthographic matrix for the given frustum. */
-    matrix< 4, 4, T > computeOrthoMatrix() const;
+    Matrix< 4, 4, T > computeOrthoMatrix() const;
 
     /** Move the frustum near plane by the given offset "sideways" */
     void jitter( const vector< 2, T >& jitter_ );
@@ -175,7 +175,7 @@ Frustum<T>::Frustum( const T fov_y, const T aspect_ratio, const T nearPlane_,
 }
 
 template < typename T >
-Frustum<T>::Frustum( const matrix< 4, 4, T >& projection )
+Frustum<T>::Frustum( const Matrix< 4, 4, T >& projection )
 {
     _array[4] = projection( 2, 3 ) / (projection( 2, 2 ) - 1.0);
     _array[5] = projection( 2, 3 ) / (projection( 2, 2 ) + 1.0);
@@ -209,9 +209,9 @@ bool Frustum<T>::equals( const Frustum< T >& other, const T tolerance ) const
 }
 
 template < typename T >
-matrix< 4, 4, T > Frustum<T>::computePerspectiveMatrix() const
+Matrix< 4, 4, T > Frustum<T>::computePerspectiveMatrix() const
 {
-    matrix< 4, 4, T > M;
+    Matrix< 4, 4, T > M;
 
     M( 0,0 ) = 2.0 * nearPlane() / ( right() - left() );
     M( 0,1 ) = 0.0;
@@ -238,9 +238,9 @@ matrix< 4, 4, T > Frustum<T>::computePerspectiveMatrix() const
 }
 
 template < typename T >
-matrix< 4, 4, T > Frustum< T >::computeOrthoMatrix() const
+Matrix< 4, 4, T > Frustum< T >::computeOrthoMatrix() const
 {
-    matrix< 4, 4, T > M;
+    Matrix< 4, 4, T > M;
 
     M( 0,0 ) = 2.0 / ( right() - left() );
     M( 0,1 ) = 0.0;

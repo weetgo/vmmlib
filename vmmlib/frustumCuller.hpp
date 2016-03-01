@@ -55,7 +55,7 @@ public:
     FrustumCuller() {}
 
     /** Construct a frustum culler using a 4x4 projection*model*view matrix. */
-    explicit FrustumCuller( const matrix< 4, 4, T >& projModelView );
+    explicit FrustumCuller( const Matrix< 4, 4, T >& projModelView );
 
     /**
      * Construct a frustum culler using the eight frustum corner points.
@@ -114,7 +114,7 @@ namespace vmml
  * matrix. The projection matrix should contain the viewing transformation.
  */
 template < typename T >
-FrustumCuller< T >::FrustumCuller( const matrix< 4, 4, T >& projModelView )
+FrustumCuller< T >::FrustumCuller( const Matrix< 4, 4, T >& projModelView )
 {
     // See http://www2.ravensoft.com/users/ggribb/plane%20extraction.pdf pp.5
     const vec4& row0 = projModelView.get_row( 0 );

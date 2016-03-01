@@ -43,7 +43,7 @@ typedef UINT8 uint8_t;
 
 namespace vmml
 {
-template< size_t M, size_t N, typename T > class matrix;
+template< size_t M, size_t N, typename T > class Matrix;
 template< size_t M, typename T > class vector;
 template < typename T > class quaternion;
 template< typename T > class AABB;
@@ -51,10 +51,10 @@ template< typename T > class Frustum;
 template< typename T > class FrustumCuller;
 template< typename T > class Ray;
 
-typedef matrix< 3, 3, double > Matrix3d; //!< A 3x3 double matrix
-typedef matrix< 4, 4, double > Matrix4d; //!< A 4x4 double matrix
-typedef matrix< 3, 3, float >  Matrix3f; //!< A 3x3 float matrix
-typedef matrix< 4, 4, float >  Matrix4f; //!< A 4x4 float matrix
+typedef Matrix< 3, 3, double > Matrix3d; //!< A 3x3 double matrix
+typedef Matrix< 4, 4, double > Matrix4d; //!< A 4x4 double matrix
+typedef Matrix< 3, 3, float >  Matrix3f; //!< A 3x3 float matrix
+typedef Matrix< 4, 4, float >  Matrix4f; //!< A 4x4 float matrix
 
 typedef vector< 2, int > Vector2i; //!< A 2-component int vector
 typedef vector< 3, int > Vector3i; //!< A 3-component int vector

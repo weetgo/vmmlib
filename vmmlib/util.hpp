@@ -59,10 +59,10 @@ template< typename T, typename U > bool equals( T arg0, U arg1)
 
 
 template< size_t M, size_t N, typename T >
-inline matrix< M, N, T >
+inline Matrix< M, N, T >
 create_translation( const vector< M - 1, T > &arg )
 {
-	matrix< M, N, T > ret;
+	Matrix< M, N, T > ret;
 	identity( ret );
 	ret.set_translation( arg );
 
@@ -70,7 +70,7 @@ create_translation( const vector< M - 1, T > &arg )
 }
 
 template< typename T >
-inline matrix< 4, 4, T >
+inline Matrix< 4, 4, T >
 create_translation( const vector< 3, T > &arg )
 {
    return create_translation< 4, 4 >(arg);
@@ -78,16 +78,16 @@ create_translation( const vector< 3, T > &arg )
 
 template< size_t M, size_t N, typename T >
 inline void
-apply_translation( matrix< M, N, T > &m, T t0, T t1, T t2 )
+apply_translation( Matrix< M, N, T > &m, T t0, T t1, T t2 )
 {
     m *= create_translation< M, N, T >( vector< M - 1, T >( t0, t1, t2 ) );
 }
 
 template< size_t M, size_t N, typename T >
-inline matrix< M, N, T >
+inline Matrix< M, N, T >
 create_rotation( T angle, const vector< M - 1, T > &axis )
 {
-	matrix< M, N, T > ret;
+	Matrix< M, N, T > ret;
 	identity( ret );
 	ret.rotate( angle, axis );
 
@@ -95,7 +95,7 @@ create_rotation( T angle, const vector< M - 1, T > &axis )
 }
 
 template< typename T >
-inline matrix< 4, 4, T >
+inline Matrix< 4, 4, T >
 create_rotation( T angle, const vector< 3, T > &axis )
 {
     return create_rotation< 4, 4 >( angle, axis );
@@ -103,16 +103,16 @@ create_rotation( T angle, const vector< 3, T > &axis )
 
 template< size_t M, size_t N, typename T >
 inline void
-apply_rotation( matrix< M, N, T > &m, T angle, T t0, T t1, T t2 )
+apply_rotation( Matrix< M, N, T > &m, T angle, T t0, T t1, T t2 )
 {
     m *= create_rotation< M, N, T >( angle, vector< M - 1, T >( t0, t1, t2 ) );
 }
 
 template< size_t M, size_t N, typename T >
-inline matrix< M, N, T >
+inline Matrix< M, N, T >
 create_scaling( const vector< N - 1, T > &arg )
 {
-    matrix< M, N, T > ret;
+    Matrix< M, N, T > ret;
     identity(ret);
     ret.scale(arg);
 
@@ -120,7 +120,7 @@ create_scaling( const vector< N - 1, T > &arg )
 }
 
 template< typename T >
-inline matrix< 4, 4, T >
+inline Matrix< 4, 4, T >
 const
 create_scaling( const vector< 3, T > &arg )
 {
@@ -128,7 +128,7 @@ create_scaling( const vector< 3, T > &arg )
 }
 
 template< typename T >
-inline matrix< 4, 4, T >
+inline Matrix< 4, 4, T >
 create_scaling( T arg )
 {
     return create_scaling< 4, 4 >( vector< 3, T >( arg ) );

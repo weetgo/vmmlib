@@ -34,7 +34,6 @@
 #define __VMML__QUATERNION__HPP__
 
 #include <vmmlib/enable_if.hpp>
-#include <vmmlib/math.hpp>
 #include <vmmlib/types.hpp>
 #include <vmmlib/vector.hpp> // used inline
 
@@ -68,7 +67,7 @@ public:
 
     // uses the top-left 3x3 part of the supplied matrix as rotation matrix
     template< size_t M >
-    quaternion( const matrix< M, M, T >& rotation_matrix_,
+    quaternion( const Matrix< M, M, T >& rotation_matrix_,
         typename enable_if< M >= 3 >::type* = 0 );
 
     /** @return true if the two quaternion are similar. */
@@ -83,7 +82,7 @@ public:
     void zero();
     void identity();
 
-    template< size_t D > void set( const matrix< D, D, T >& rotation_matrix_ );
+    template< size_t D > void set( const Matrix< D, D, T >& rotation_matrix_ );
 
     bool operator==( const T& a ) const;
     bool operator!=( const T& a ) const;
@@ -144,9 +143,9 @@ public:
     static quaternion slerp( T a, const quaternion& p,
         const quaternion& q, const T epsilon = 1e-13 );
 
-    matrix< 3, 3, T > get_rotation_matrix() const;
+    Matrix< 3, 3, T > get_rotation_matrix() const;
 
-    template< size_t D > void get_rotation_matrix( matrix< D, D, T >& result ) const;
+    template< size_t D > void get_rotation_matrix( Matrix< D, D, T >& result ) const;
 
     static const quaternion IDENTITY;
     static const quaternion QUATERI;
@@ -207,7 +206,7 @@ quaternion< T >::quaternion( T x_, T y_, T z_, T w_ )
 
 
 template< typename T > template< size_t M >
-quaternion< T >::quaternion( const matrix< M, M, T >& rotation_matrix_,
+quaternion< T >::quaternion( const Matrix< M, M, T >& rotation_matrix_,
                              typename enable_if< M >= 3 >::type* )
 {
     this->template set< M >( rotation_matrix_ );
@@ -236,7 +235,7 @@ bool quaternion< T >::equals( const quaternion& other, const T tolerance ) const
 
 // top-left 3x3 is interpreted as rot matrix.
 template < typename T > template< size_t D >
-void quaternion< T >::set( const matrix< D, D, T >& M )
+void quaternion< T >::set( const Matrix< D, D, T >& M )
 {
     T trace = M( 0, 0 ) + M( 1, 1 ) + M( 2,2 ) + 1.0;
 
@@ -638,10 +637,9 @@ quaternion< T > quaternion< T >::normal( const quaternion< T >& aa,
 }
 
 template < typename T >
-matrix< 3, 3, T >
-quaternion< T >::get_rotation_matrix() const
+Matrix< 3, 3, T > quaternion< T >::get_rotation_matrix() const
 {
-    matrix< 3, 3, T > result;
+    Matrix< 3, 3, T > result;
     get_rotation_matrix< 3 >( result );
     return result;
 }
@@ -649,7 +647,7 @@ quaternion< T >::get_rotation_matrix() const
 
 
 template < typename T > template< size_t D >
-void quaternion< T >::get_rotation_matrix( matrix< D, D, T >& M ) const
+void quaternion< T >::get_rotation_matrix( Matrix< D, D, T >& M ) const
 {
     T w2 = array[3] * array[3];
     T x2 = array[0] * array[0];

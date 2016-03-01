@@ -33,10 +33,10 @@
 #ifndef __VMML__VECTOR__HPP__
 #define __VMML__VECTOR__HPP__
 
-#include <vmmlib/math.hpp>
 #include <vmmlib/enable_if.hpp>
 
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <iomanip>
 #include <iostream>
@@ -274,10 +274,6 @@ public:
     // returns the index of the minimal resp. maximal value in the vector
     size_t      find_min_index() const;
     size_t      find_max_index() const;
-
-    // returns the index of the minimal resp. maximal value in the vector
-    size_t      find_abs_min_index() const;
-    size_t      find_abs_max_index() const;
 
     // returns minimal resp. maximal value in the vector
     T&          find_min();
@@ -1227,20 +1223,6 @@ size_t
 vector< M, T >::find_max_index() const
 {
     return std::max_element( begin(), end() ) - begin();
-}
-
-template< size_t M, typename T >
-size_t
-vector< M, T >::find_abs_min_index() const
-{
-    return std::min_element( begin(), end(), vmml::math::abs_less< T >() ) - begin();
-}
-
-template< size_t M, typename T >
-size_t
-vector< M, T >::find_abs_max_index() const
-{
-    return std::max_element( begin(), end(), vmml::math::abs_greater< T >() ) - begin();
 }
 
 template< size_t M, typename T >

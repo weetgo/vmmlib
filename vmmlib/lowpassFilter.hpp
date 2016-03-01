@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014, Visualization and Multimedia Lab,
+ * Copyright (c) 2006-2016, Visualization and Multimedia Lab,
  *                          University of Zurich <http://vmml.ifi.uzh.ch>,
  *                          Eyescale Software GmbH,
  *                          Blue Brain Project, EPFL
@@ -29,76 +29,67 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __VMML__MATH__HPP__
-#define __VMML__MATH__HPP__
 
-#include <cmath>
+/* @author Jafet Villafranca
+ *
+ * Implements low pass filtering on a templated data type, which needs to
+ * implement multiplication by a scalar float for smoothing
+ */
 
-#ifndef M_PI
-#	define M_PI 3.14159265358979323846
-#endif
+#ifndef __VMML__LOWPASS_FILTER__HPP__
+#define __VMML__LOWPASS_FILTER__HPP__
+
+#include <deque>
 
 namespace vmml
 {
-
-namespace math
+template< size_t M, typename T > class LowpassFilter
 {
-// helpers for certain cmath functions
+public:
+    /** Construct a new lowpass filter with the given smoothing. */
+    LowpassFilter( const float F ) : _smoothFactor( F ) {}
+    ~LowpassFilter() {}
 
+    /** @return The current filtered output value */
+    const T& get() const { return _value; }
 
-template< class T >
-inline T squared( const T a )
-{
-    return ( a == 0.0 ) ? 0.0 : a * a;
-}
+    /** Access the filtered value. */
+    const T* operator->() const { return &_value; }
 
+    /** Access the filtered value. */
+    const T& operator*() const { return _value; }
 
+    /** Add a value to the data set and return the filtered output */
+    const T& add( const T& value );
 
-/*
- * Computes (a2 + b2)1/2 without destructive underflow or overflow.
- */
-template< class T >
-inline T pythag( T a, T b )
-{
-    a = std::abs(a);
-    b = std::abs(b);
-    if ( a > b )
-        return a * std::sqrt( 1.0 + squared( b / a ) );
-    else
-        return ( b == 0.0 ) ? 0.0 : b * sqrt( 1.0 + squared( a / b ) );
-}
-
-
-
-template< class T >
-inline T sign( T a, T b )
-{
-    return ( b >= 0.0 ) ? std::abs( a ) : -std::abs( a );
-}
-
-
-
-template< typename T >
-struct abs_less
-{
-    T operator()( const T& a, const T& b )
-    {
-        return std::abs(a) < std::abs( b );
-    }
+private:
+    std::deque< T > _data;
+    float _smoothFactor;
+    T _value;
 };
 
 
-template< typename T >
-struct abs_greater
+template< size_t M, typename T >
+const T& LowpassFilter< M, T >::add( const T& value )
 {
-    T operator()( const T& a, const T& b )
+    _data.push_front( value );
+
+    while( _data.size() > M )
+        _data.pop_back();
+
+    // update
+    typename std::deque< T >::const_iterator i = _data.begin();
+    _value = *i;
+    double weight = _smoothFactor;
+
+    for( ++i ; i != _data.end(); ++i )
     {
-        return std::abs(a) > std::abs( b );
+        _value = _value * (1 - weight) + (*i) * weight;
+        weight *= _smoothFactor;
     }
-};
 
-
-} // namespace math
+    return _value;
+}
 
 } // namespace vmml
 
