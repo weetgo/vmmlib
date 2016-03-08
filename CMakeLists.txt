@@ -7,7 +7,7 @@ project(vmmlib)
 set(VERSION_MAJOR 1)
 set(VERSION_MINOR 10)
 set(VERSION_PATCH 0)
-set(VERSION_ABI 5)
+set(VERSION_ABI 6)
 
 set(COMMON_PROJECT_DOMAIN ch.eyescale)
 set(VMMLIB_DESCRIPTION "Templatized C++ vector and matrix math library")
