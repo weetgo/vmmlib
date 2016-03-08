@@ -2,6 +2,10 @@
 
 # git master
 
+# Release 1.10 (08-03-2016)
+
+* Improved API and test coverage
+
 # Release 1.9 (02-11-2015)
 
 * [35](https://github.com/Eyescale/vmmlib/pull/35):
