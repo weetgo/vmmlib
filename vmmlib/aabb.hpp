@@ -60,10 +60,10 @@ public:
     AABB( const vector< 4, T >& sphere );
 
     /** @return true if the given point is within this bounding box. */
-    bool isIn( const vector< 3, T >& point );
+    bool isIn( const vector< 3, T >& point ) const;
 
     /** @return true if the given sphere is within this bounding box. */
-    bool isIn( const vector< 4, T >& sphere );
+    bool isIn( const vector< 4, T >& sphere ) const;
 
     /** @return the minimum corner point */
     const vector< 3, T >& getMin() const;
@@ -149,7 +149,7 @@ template< typename T > AABB< T >::AABB( const vector< 4, T >& sphere )
     _min -= sphere.getRadius();
 }
 
-template< typename T > inline bool AABB< T >::isIn( const vector< 3, T >& pos )
+template< typename T > inline bool AABB< T >::isIn( const vector< 3, T >& pos ) const
 {
     if ( pos.x() > _max.x() || pos.y() > _max.y() || pos.z() > _max.z() ||
          pos.x() < _min.x() || pos.y() < _min.y() || pos.z() < _min.z( ))
@@ -160,7 +160,7 @@ template< typename T > inline bool AABB< T >::isIn( const vector< 3, T >& pos )
 }
 
 template< typename T > inline
-bool AABB< T >::isIn( const vector< 4, T >& sphere )
+bool AABB< T >::isIn( const vector< 4, T >& sphere ) const
 {
     const vector< 3, T >& sv = sphere.getCenter();
     sv += sphere.getRadius();
