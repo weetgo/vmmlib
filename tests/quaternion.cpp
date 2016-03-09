@@ -40,16 +40,16 @@ BOOST_AUTO_TEST_CASE( construction )
     BOOST_CHECK_EQUAL( q2, vmml::Quaternionf( 0, 0, 0, 1 ));
     BOOST_CHECK_EQUAL( q2, q1 );
 
-    const vmml::Quaternionf q3( 0.3, vmml::Vector3f( .5, .5, 1 ));
+    const vmml::Quaternionf q3( 0.3f, vmml::Vector3f( .5f, .5f, 1.f ));
     BOOST_CHECK_MESSAGE( q3.equals( vmml::Quaternionf( 0.0610079f, 0.0610079f,
                                                        0.122016f, 0.988771f ),
-                                    0.00001 ), q3 );
+                                    0.00001f ), q3 );
 }
 
 BOOST_AUTO_TEST_CASE( rotate )
 {
-    const vmml::Quaternionf q1( 0.3, vmml::Vector3f( .5, .5, 1 ));
+    const vmml::Quaternionf q1( 0.3f, vmml::Vector3f( .5f, .5f, 1.f ));
     BOOST_CHECK_MESSAGE( (q1 * q1).equals(
-                vmml::Quaternionf( 0.6, vmml::Vector3f( .5, .5, 1 )), 0.00001 ),
-                         vmml::Quaternionf( 0.6, vmml::Vector3f( .5, .5, 1 )));
+                vmml::Quaternionf( 0.6f, vmml::Vector3f( .5f, .5f, 1.f )), 0.00001f ),
+                         vmml::Quaternionf( 0.6f, vmml::Vector3f( .5f, .5f, 1.f )));
 }

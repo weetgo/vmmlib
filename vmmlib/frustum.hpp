@@ -145,7 +145,7 @@ template< typename T > Frustum< T >::Frustum()
     _array[1] = 1;
     _array[2] = -1;
     _array[3] = 1;
-    _array[4] = 0.1;
+    _array[4] = 0.1f;
     _array[5] = 100;
 }
 
