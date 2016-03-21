@@ -86,6 +86,15 @@ public:
     matrix( const quaternion< T >& rotation, const vector< O, T >& translation,
             typename enable_if< M == O+1 && N == O+1 && O == 3 >::type* = 0 );
 
+    /**
+     * Construct a new transformation matrix from an eye position, lookat
+     * position and up vector, following convention from gluLookAt().
+     */
+    template< size_t O >
+    matrix( const vector< O, T >& eye, const vector< O, T >& lookat,
+            const vector< O, T >& up,
+            typename enable_if< M == O+1 && N == O+1 && O == 3 >::type* = 0 );
+
     // accessors
     inline T& operator()( size_t row_index, size_t col_index );
     inline const T& operator()( size_t row_index, size_t col_index ) const;
@@ -402,6 +411,15 @@ public:
     void get_translation( vector< N-1, TT >& translation_ ) const;
 
     vector< N-1, T > get_translation() const;
+
+    /**
+     * Decompose a 4x4 transformation matrix to eye position, lookAt position
+     * and up vector.
+     */
+    template< size_t O >
+    void getLookAt( vector< O, T >& eye, vector< O, T >& lookAt,
+                    vector< O, T >& up,
+        typename enable_if< M == O+1 && N == O+1 && O == 3 >::type* = 0 ) const;
 
     // hack for static-member-init
     template< typename init_functor_t >
@@ -836,6 +854,33 @@ matrix< M, N, T >::matrix( const quaternion< T >& rotation,
     at( 3, 1 ) = 0;
     at( 3, 2 ) = 0;
     at( 3, 3 ) = 1;
+}
+
+template< size_t M, size_t N, typename T >
+template< size_t O >
+matrix< M, N, T >::matrix( const vector< O, T >& eye,
+                           const vector< O, T >& lookat,
+                           const vector< O, T >& up,
+               typename enable_if< M == O+1 && N == O+1 && O == 3 >::type* )
+{
+    *this = matrix< 4, 4, T >::IDENTITY;
+
+    const vector< 3, T > f( vmml::normalize( lookat - eye ));
+    const vector< 3, T > s( vmml::normalize( vmml::cross( f, up )));
+    const vector< 3, T > u( vmml::cross( s, f ));
+
+    at( 0, 0 ) =  s.x();
+    at( 0, 1 ) =  s.y();
+    at( 0, 2 ) =  s.z();
+    at( 1, 0 ) =  u.x();
+    at( 1, 1 ) =  u.y();
+    at( 1, 2 ) =  u.z();
+    at( 2, 0 ) = -f.x();
+    at( 2, 1 ) = -f.y();
+    at( 2, 2 ) = -f.z();
+    at( 0, 3 ) = -vmml::dot( s, eye );
+    at( 1, 3 ) = -vmml::dot( u, eye );
+    at( 2, 3 ) =  vmml::dot( f, eye );
 }
 
 template< size_t M, size_t N, typename T >
@@ -2061,7 +2106,23 @@ inline vector< N-1, T > matrix< M, N, T >::get_translation() const
     return result;
 }
 
+template< size_t M, size_t N, typename T >
+template< size_t O >
+void matrix< M, N, T >::getLookAt( vector< O, T >& eye, vector< O, T >& lookAt,
+                                   vector< O, T >& up,
+             typename enable_if< M == O+1 && N == O+1 && O == 3 >::type* ) const
+{
+    matrix< 4, 4, T > inv;
+    inverse( inv );
 
+    const matrix< 3, 3, T > rotation( transpose( matrix< 3, 3, T >( *this )));
+
+    eye = inv * vector< 3, T >::ZERO;
+    up = rotation * vector< 3, T >::UP;
+    lookAt = rotation * vector< 3, T >::FORWARD;
+    lookAt.normalize();
+    lookAt = eye + lookAt;
+}
 
 template< size_t M, size_t N, typename T >
 size_t

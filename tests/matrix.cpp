@@ -61,3 +61,18 @@ BOOST_AUTO_TEST_CASE( construction )
                            1.f, 2.f, 3.f, 1 };
     BOOST_CHECK_EQUAL( m1, vmml::Matrix4f( data, data + 16 ));
 }
+
+BOOST_AUTO_TEST_CASE( lookat )
+{
+    const vmml::Vector3f eye( 1, 2, 3 );
+    const vmml::Vector3f lookAt( eye + vmml::Vector3f( 0, 1, 0 ));
+    const vmml::Vector3f up( 0, 0, 1 );
+
+    const vmml::Matrix4f m1( eye, lookAt, up );
+
+    vmml::Vector3f newEye, newLookAt, newUp;
+    m1.getLookAt( newEye, newLookAt, newUp );
+    BOOST_CHECK_EQUAL( eye, newEye );
+    BOOST_CHECK_EQUAL( lookAt, newLookAt );
+    BOOST_CHECK_EQUAL( up, newUp );
+}
