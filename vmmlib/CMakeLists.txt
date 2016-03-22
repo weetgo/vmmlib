@@ -8,7 +8,6 @@ set(VMMLIB_PUBLIC_HEADERS
   frustumCuller.hpp
   lowpassFilter.hpp
   matrix.hpp
-  matrix_functors.hpp
   quaternion.hpp
   ray.hpp
   types.hpp

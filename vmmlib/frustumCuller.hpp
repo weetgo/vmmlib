@@ -117,10 +117,10 @@ template < typename T >
 FrustumCuller< T >::FrustumCuller( const Matrix< 4, 4, T >& projModelView )
 {
     // See http://www2.ravensoft.com/users/ggribb/plane%20extraction.pdf pp.5
-    const vec4& row0 = projModelView.get_row( 0 );
-    const vec4& row1 = projModelView.get_row( 1 );
-    const vec4& row2 = projModelView.get_row( 2 );
-    const vec4& row3 = projModelView.get_row( 3 );
+    const vec4& row0 = projModelView.getRow( 0 );
+    const vec4& row1 = projModelView.getRow( 1 );
+    const vec4& row2 = projModelView.getRow( 2 );
+    const vec4& row3 = projModelView.getRow( 3 );
 
     _leftPlane   = row3 + row0;
     _rightPlane  = row3 - row0;

@@ -2,6 +2,9 @@
 
 # git master
 
+* [50](https://github.com/Eyescale/vmmlib/pull/50):
+  Improved matrix and lowpass filter API
+
 # Release 1.10 (07-04-2016)
 
 * [49](https://github.com/Eyescale/vmmlib/pull/49):
