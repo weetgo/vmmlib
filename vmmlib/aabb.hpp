@@ -278,6 +278,6 @@ template< typename T > AABB< T > AABB< T >::makeUnitBox()
     return AABB( vector< 3, T >::ZERO, vector< 3, T >::ONE );
 }
 
-}; //namespace vmml
+}
 
 #endif

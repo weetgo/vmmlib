@@ -179,7 +179,7 @@ template< typename T > template< size_t M >
 Quaternion< T >::Quaternion( const Matrix< M, M, T >& rot,
                              typename enable_if< M >= 3 >::type* )
 {
-    const T trace = rot( 0, 0 ) + rot( 1, 1 ) + rot( 2,2 ) + 1.0;
+    const T trace = rot( 0, 0 ) + rot( 1, 1 ) + rot( 2,2 ) + T( 1 );
     static const T TRACE_EPSILON = 1e-5;
 
     // very small traces may introduce a big numerical error
@@ -199,13 +199,14 @@ Quaternion< T >::Quaternion( const Matrix< M, M, T >& rot,
     }
     else
     {
-        vector< 3, T > diag( rot( 0, 0 ), rot( 1, 1 ), rot( 2, 2 ) );
-        size_t largest = diag.find_max_index();
+        const vector< 3, T > diag( rot( 0, 0 ), rot( 1, 1 ), rot( 2, 2 ) );
+        const size_t largest = diag.find_max_index();
 
         // 0, 0 is largest
         if ( largest == 0 )
         {
-            T s = 0.5 / std::sqrt( 1.0 + rot( 0,0 ) - rot( 1,1 ) - rot( 2,2 ));
+            const T s = 0.5 / std::sqrt( T( 1 ) + rot( 0,0 ) - rot( 1,1 ) -
+                                         rot( 2,2 ));
             array[0] = 0.25 / s;
 
             array[1] = rot( 0,1 ) + rot( 1,0 );
@@ -219,7 +220,8 @@ Quaternion< T >::Quaternion( const Matrix< M, M, T >& rot,
         }
         else if ( largest == 1 )
         {
-            T s = 0.5 / std::sqrt( 1.0 + rot( 1,1 ) - rot( 0,0 ) - rot( 2,2 ) );
+            const T s = 0.5 / std::sqrt( T( 1 ) + rot( 1,1 ) - rot( 0,0 ) -
+                                         rot( 2,2 ));
             array[0] = rot( 0,1 ) + rot( 1,0 );
             array[0] *= s;
 
@@ -234,7 +236,8 @@ Quaternion< T >::Quaternion( const Matrix< M, M, T >& rot,
         // 2, 2 is largest
         else if ( largest == 2 )
         {
-            T s = 0.5 / std::sqrt( 1.0 + rot( 2,2 ) - rot( 0,0 ) - rot( 1,1 ) );
+            const T s = 0.5 / std::sqrt( T( 1 ) + rot( 2,2 ) - rot( 0,0 ) -
+                                         rot( 1,1 ));
             array[0] = rot( 0,2 ) + rot( 2,0 );
             array[0] *= s;
 
@@ -313,7 +316,7 @@ template < typename T > Quaternion< T > Quaternion< T >::inverse() const
 template < typename T > void Quaternion< T >::normalize()
 {
     T len = abs();
-    if( len == 0.0 )
+    if( len == T( 0 ))
         return;
     len = T( 1 ) / len;
     this->operator*=( len );
@@ -415,7 +418,7 @@ Quaternion< T > Quaternion< T >::operator*( const T a_ ) const
 template < typename T >
 Quaternion< T > Quaternion< T >::operator/( T a_ ) const
 {
-    if ( a_ == 0.0 )
+    if ( a_ == T( 0 ))
         throw std::runtime_error( "Division by zero." );
 
     a_ = T( 1 ) / a_;
@@ -433,10 +436,10 @@ template < typename T > void Quaternion< T >::operator*=( T q )
 
 template < typename T > void Quaternion< T >::operator/=( T q )
 {
-    if ( q == 0.0 )
+    if ( q == T( 0 ))
         throw std::runtime_error( "Division by zero" );
 
-    q = 1.0f / q;
+    q = T( 1 ) / q;
     this->operator*=( q );
 }
 

@@ -36,15 +36,14 @@
 #include <vmmlib/enable_if.hpp>
 #include <vmmlib/types.hpp>
 
-#include <iostream>
-#include <iomanip>
-#include <vector>
-#include <cstddef>
-#include <limits>
 #include <algorithm>
-#include <string>
+#include <cmath>
 #include <cstring>
+#include <iomanip>
+#include <iostream>
+#include <limits>
 #include <stdexcept>
+#include <vector>
 
 namespace vmml
 {
@@ -52,11 +51,6 @@ namespace vmml
 template< size_t R, size_t C, typename T > class Matrix
 {
 public:
-    typedef T* iterator;
-    typedef const T* const_iterator;
-    typedef std::reverse_iterator< T* > reverse_iterator;
-    typedef std::reverse_iterator< const T* > const_reverse_iterator;
-
     /**
      * Construct a zero-initialized matrix.
      * Square matrices are initialized as identity.
@@ -73,10 +67,13 @@ public:
      * Construct a matrix with default values.
      * Missing data is zero-initialized. Additional data is ignored.
      */
-    Matrix( const std::vector< T >& data );
+    explicit Matrix( const std::vector< T >& data );
 
-    /** Copy-construct a matrix */
-    template< size_t P, size_t Q > Matrix( const Matrix< P, Q, T >& source_ );
+    /**
+     * Copy-construct a matrix.
+     * Missing data is zero-initialized. Additional data is ignored.
+     */
+    template< size_t P, size_t Q > Matrix( const Matrix< P, Q, T >& source );
 
     /**
      * Construct a new 4x4 transformation matrix from a rotation quaternion and
@@ -94,26 +91,6 @@ public:
     Matrix( const vector< S, T >& eye, const vector< S, T >& lookat,
             const vector< S, T >& up,
             typename enable_if< R == S+1 && C == S+1 && S == 3 >::type* = 0 );
-
-
-    /** @name element iterators in column-major order */
-    //@{
-    iterator begin();
-    iterator end();
-    const_iterator begin() const;
-    const_iterator end() const;
-
-    reverse_iterator rbegin();
-    reverse_iterator rend();
-    const_reverse_iterator rbegin() const;
-    const_reverse_iterator rend() const;
-    //@}
-
-    /** @name matrix operations */
-    //@{
-    /** @return the negated matrix of this matrix. */
-    Matrix< R, C, T > operator-() const;
-    //@}
 
     /** @name matrix-matrix operations */
     //@{
@@ -160,19 +137,13 @@ public:
     vector< R, T > operator*( const vector< C, T >& other ) const;
     //@}
 
-    /** @name matrix-scalar operations */
-    //@{
-    /** Element-wise division by a scalar */
-    void operator/=( T scalar );
-    //@}
-
     /** @name Data access */
     //@{
     /** @return the element at the given row and column. */
-    inline T& operator()( size_t rowIndex, size_t colIndex );
+    T& operator()( size_t rowIndex, size_t colIndex );
 
     /** @return the element at the given row and column. */
-    inline T operator()( size_t rowIndex, size_t colIndex ) const;
+    T operator()( size_t rowIndex, size_t colIndex ) const;
 
     /** @return the pointer to the data storage in column-major order. */
     const T* data() const { return array; }
@@ -205,6 +176,9 @@ public:
      */
     void operator=( const std::vector< T >& data );
 
+    /** @return the negated matrix of this matrix. */
+    Matrix< R, C, T > operator-() const;
+
     /** @return a vector of the given column. */
     vector< R, T > getColumn( size_t columnIndex ) const;
 
@@ -222,9 +196,6 @@ public:
 
     /** Set the translation vector (of a 3x3 or 4x4 matrix) */
     Matrix< R, C, T >& setTranslation( const vector< C-1, T >& t );
-
-    /** @return the number of elements in this matrix. */
-    size_t size() const { return R * C; }
 
     /**
      * Decompose a 4x4 transformation matrix to eye position, lookAt position
@@ -283,10 +254,6 @@ public:
                         typename enable_if< R == C && R == 4, TT >::type* = 0 );
 
     template< typename TT >
-    Matrix< R, C, T >& scale( const TT scale[3],
-                        typename enable_if< R == C && R == 4, TT >::type* = 0 );
-
-    template< typename TT >
     Matrix< R, C, T >& scale( const vector< 3, TT >& scale_,
                         typename enable_if< R == C && R == 4, TT >::type* = 0 );
 
@@ -318,7 +285,6 @@ public:
         return os;
     };
 
-//private:
     T array[ R * C ]; //!< column by column storage
 };
 }
@@ -395,7 +361,11 @@ Matrix< 2, 2, T > compute_inverse( const Matrix< 2, 2, T >& m_ )
 
     Matrix< 2, 2, T > inverse;
     m_.getAdjugate( inverse );
-    inverse /= det;
+    const T detinv = 1 / det;
+    inverse( 0, 0 ) *= detinv;
+    inverse( 0, 1 ) *= detinv;
+    inverse( 1, 0 ) *= detinv;
+    inverse( 1, 1 ) *= detinv;
     return inverse;
 }
 
@@ -501,14 +471,14 @@ Matrix< R, C, T > compute_inverse( const Matrix< R, C, T >& )
     throw std::runtime_error( "Can't compute inverse of this matrix" );
 }
 
-// this function returns the transposed of a matrix
+/** @return the transposed of a matrix */
 template< size_t R, size_t C, typename T > inline
-Matrix< C, R, T > transpose( const Matrix< R, C, T >& matrix_ )
+Matrix< C, R, T > transpose( const Matrix< R, C, T >& matrix )
 {
     Matrix< C, R, T > transposed;
     for( size_t row = 0; row< R; ++row )
         for( size_t col = 0; col < C; ++col )
-            transposed( col, row ) = matrix_( row, col );
+            transposed( col, row ) = matrix( row, col );
     return transposed;
 }
 //@}
@@ -533,14 +503,14 @@ Matrix< R, C, T >::Matrix( const T* begin_, const T* end_ )
 template< size_t R, size_t C, typename T >
 Matrix< R, C, T >::Matrix( const std::vector< T >& values )
 {
-    (*this) = values;
+    *this = values;
 }
 
 template< size_t R, size_t C, typename T >
 template< size_t P, size_t Q >
-Matrix< R, C, T >::Matrix( const Matrix< P, Q, T >& source_ )
+Matrix< R, C, T >::Matrix( const Matrix< P, Q, T >& source )
 {
-    (*this) = source_;
+    *this = source;
 }
 
 template< size_t R, size_t C, typename T > template< size_t O >
@@ -548,7 +518,7 @@ Matrix< R, C, T >::Matrix( const Quaternion< T >& rotation,
                            const vector< O, T >& translation,
                    typename enable_if< R == O+1 && C == O+1 && O == 3 >::type* )
 {
-    (*this) = rotation.getRotationMatrix();
+    *this = rotation.getRotationMatrix();
     setTranslation( translation );
     (*this)( 3, 0 ) = 0;
     (*this)( 3, 1 ) = 0;
@@ -619,31 +589,27 @@ bool Matrix< R, C, T >::equals( const Matrix< R, C, T >& other,
 {
     for( size_t i = 0; i < R * C; ++i )
         if( std::abs( array[ i ] - other.array[ i ]) > tolerance )
-        {
-            std::cout << i << ": " << array[i] << " != " << other.array[i]
-                      << std::endl;
             return false;
-        }
     return true;
 }
 
 template< size_t R, size_t C, typename T > const Matrix< R, C, T >&
-Matrix< R, C, T >::operator=( const Matrix< R, C, T >& source_ )
+Matrix< R, C, T >::operator=( const Matrix< R, C, T >& source )
 {
-    ::memcpy( array, source_.array, R * C * sizeof( T ));
+    ::memcpy( array, source.array, R * C * sizeof( T ));
     return *this;
 }
 
 template< size_t R, size_t C, typename T > template< size_t P, size_t Q >
 const Matrix< R, C, T >&
-Matrix< R, C, T >::operator=( const Matrix< P, Q, T >& source_ )
+Matrix< R, C, T >::operator=( const Matrix< P, Q, T >& source )
 {
-    const size_t minL =  std::min( P, R );
-    const size_t minC =  std::min( Q, C );
+    const size_t minL = std::min( P, R );
+    const size_t minC = std::min( Q, C );
 
     for ( size_t i = 0 ; i < minL ; ++i )
         for ( size_t j = 0 ; j < minC ; ++j )
-            (*this)( i, j ) = source_( i, j );
+            (*this)( i, j ) = source( i, j );
     for ( size_t i = minL ; i< R ; ++i )
         for ( size_t j = minC ; j < C ; ++j )
             (*this)( i, j ) = 0;
@@ -696,8 +662,7 @@ Matrix< R, P, T > Matrix< R, C, T >::operator*( const Matrix< C, P, T >& other )
     return result.multiply( *this, other );
 }
 
-template< size_t R, size_t C, typename T >
-template< size_t O, size_t P >
+template< size_t R, size_t C, typename T > template< size_t O, size_t P >
 typename enable_if< R == C && O == P && R == O >::type*
 Matrix< R, C, T >::operator*=( const Matrix< O, P, T >& right )
 {
@@ -720,14 +685,6 @@ vector< R, T > Matrix< R, C, T >::operator*( const vector< C, T >& vec ) const
         result( i ) = tmp;
     }
     return result;
-}
-
-template< size_t R, size_t C, typename T >
-void Matrix< R, C, T >::operator /= ( const T scalar )
-{
-    const T inv = 1 / scalar;
-    for( size_t i = 0; i< R * C; ++i )
-        array[ i ] *= inv;
 }
 
 template< size_t R, size_t C, typename T > inline
@@ -834,9 +791,7 @@ Matrix< R, C, T >::setSubMatrix( const Matrix< O, P, T >& sub_matrix,
 {
     for( size_t row = 0; row < O; ++row )
         for( size_t col = 0; col < P; ++col )
-            (*this)( rowOffset + row, colOffset + col )
-                = sub_matrix( row, col );
-
+            (*this)( rowOffset + row, colOffset + col ) = sub_matrix( row, col);
     return 0; // for sfinae
 }
 
@@ -1135,56 +1090,6 @@ void Matrix< R, C, T >::getLookAt( vector< S, T >& eye, vector< S, T >& lookAt,
     lookAt = rotation * vector< 3, T >::FORWARD;
     lookAt.normalize();
     lookAt = eye + lookAt;
-}
-
-template< size_t R, size_t C, typename T >
-typename Matrix< R, C, T >::iterator Matrix< R, C, T >::begin()
-{
-    return array;
-}
-
-template< size_t R, size_t C, typename T >
-typename Matrix< R, C, T >::iterator Matrix< R, C, T >::end()
-{
-    return array + size();
-}
-
-template< size_t R, size_t C, typename T >
-typename Matrix< R, C, T >::const_iterator Matrix< R, C, T >::begin() const
-{
-    return array;
-}
-
-template< size_t R, size_t C, typename T >
-typename Matrix< R, C, T >::const_iterator Matrix< R, C, T >::end() const
-{
-    return array + size();
-}
-
-template< size_t R, size_t C, typename T >
-typename Matrix< R, C, T >::reverse_iterator Matrix< R, C, T >::rbegin()
-{
-    return reverse_iterator( array + size() - 1 );
-}
-
-template< size_t R, size_t C, typename T >
-typename Matrix< R, C, T >::reverse_iterator Matrix< R, C, T >::rend()
-{
-    return reverse_iterator( array - 1 );
-}
-
-template< size_t R, size_t C, typename T >
-typename Matrix< R, C, T >::const_reverse_iterator Matrix< R, C, T >::rbegin()
-    const
-{
-    return const_reverse_iterator( array + size() - 1 );
-}
-
-template< size_t R, size_t C, typename T >
-typename Matrix< R, C, T >::const_reverse_iterator Matrix< R, C, T >::rend()
-    const
-{
-    return const_reverse_iterator( array - 1 );
 }
 
 } // namespace vmml

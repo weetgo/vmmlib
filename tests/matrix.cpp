@@ -81,4 +81,4 @@ template class vmml::Matrix< 1, 1, float >;
 template class vmml::Matrix< 2, 2, double >;
 template class vmml::Matrix< 3, 3, short >;
 template class vmml::Matrix< 3, 4, int >;
-//template class vmml::Matrix< 4, 4, unsigned >;
+template class vmml::Matrix< 4, 4, long >;

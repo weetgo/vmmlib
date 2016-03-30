@@ -31,11 +31,7 @@
 
 #include <sys/types.h>
 #ifdef _MSC_VER
-#  ifndef HAVE_SSIZE_T
-#    include <basetsd.h>
-typedef SSIZE_T ssize_t;
-#    define HAVE_SSIZE_T
-#  endif
+#  include <basetsd.h>
 typedef UINT8 uint8_t;
 #else
 #  include <stdint.h>
@@ -45,45 +41,45 @@ namespace vmml
 {
 template< size_t M, size_t N, typename T > class Matrix;
 template< size_t M, typename T > class vector;
-template < typename T > class Quaternion;
 template< typename T > class AABB;
 template< typename T > class Frustum;
 template< typename T > class FrustumCuller;
+template< typename T > class Quaternion;
 template< typename T > class Ray;
 
 typedef Matrix< 3, 3, double > Matrix3d; //!< A 3x3 double matrix
-typedef Matrix< 4, 4, double > Matrix4d; //!< A 4x4 double matrix
 typedef Matrix< 3, 3, float >  Matrix3f; //!< A 3x3 float matrix
+typedef Matrix< 4, 4, double > Matrix4d; //!< A 4x4 double matrix
 typedef Matrix< 4, 4, float >  Matrix4f; //!< A 4x4 float matrix
 
-typedef vector< 2, int > Vector2i; //!< A 2-component int vector
-typedef vector< 3, int > Vector3i; //!< A 3-component int vector
-typedef vector< 4, int > Vector4i; //!< A 4-component int vector
-typedef vector< 2, unsigned > Vector2ui; //!< A 2-component unsigned int vector
-typedef vector< 3, unsigned > Vector3ui; //!< A 3-component unsigned int vector
-typedef vector< 4, unsigned > Vector4ui; //!< A 4-component unsigned int vector
-typedef vector< 3, double > Vector3d; //!< A 3-component double vector
-typedef vector< 4, double > Vector4d; //!< A 4-component double vector
 typedef vector< 2, float > Vector2f; //!< A 2-component float vector
+typedef vector< 2, int > Vector2i; //!< A 2-component int vector
+typedef vector< 2, unsigned > Vector2ui; //!< A 2-component unsigned int vector
+typedef vector< 3, double > Vector3d; //!< A 3-component double vector
 typedef vector< 3, float > Vector3f; //!< A 3-component float vector
-typedef vector< 4, float > Vector4f; //!< A 4-component float vector
+typedef vector< 3, int > Vector3i; //!< A 3-component int vector
 typedef vector< 3, uint8_t > Vector3ub; //!< A 3-component byte vector
+typedef vector< 3, unsigned > Vector3ui; //!< A 3-component unsigned int vector
+typedef vector< 4, double > Vector4d; //!< A 4-component double vector
+typedef vector< 4, float > Vector4f; //!< A 4-component float vector
+typedef vector< 4, int > Vector4i; //!< A 4-component int vector
 typedef vector< 4, uint8_t > Vector4ub; //!< A 4-component byte vector
+typedef vector< 4, unsigned > Vector4ui; //!< A 4-component unsigned int vector
 
+typedef Quaternion< double > Quaterniond; //!< A double quaternion
 typedef Quaternion< float >  Quaternionf; //!< A float quaternion
-typedef Quaternion< double > Quaterniond; //!< A doubl quaternion
 
-typedef Frustum< float >  Frustumf; //!< A float frustum
 typedef Frustum< double > Frustumd; //!< A double frustum
+typedef Frustum< float >  Frustumf; //!< A float frustum
 
-typedef FrustumCuller< float >  FrustumCullerf; //!< A float frustum culler
 typedef FrustumCuller< double > FrustumCullerd; //!< A double frustum culler
+typedef FrustumCuller< float >  FrustumCullerf; //!< A float frustum culler
 
-typedef AABB< float >  AABBf; //!< A float bounding box
 typedef AABB< double > AABBd; //!< A double bounding box
+typedef AABB< float >  AABBf; //!< A float bounding box
 
-typedef vmml::Ray< float > Rayf; //!< A float ray
-typedef vmml::Ray< double > Rayd; //!< A double ray
+typedef Ray< double > Rayd; //!< A double ray
+typedef Ray< float > Rayf; //!< A float ray
 
 }
 
