@@ -11,7 +11,6 @@ set(VMMLIB_PUBLIC_HEADERS
   quaternion.hpp
   ray.hpp
   types.hpp
-  util.hpp
   vector.hpp
   visibility.hpp
   vmmlib.hpp

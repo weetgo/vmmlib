@@ -45,7 +45,7 @@ namespace vmml
 {
 template< size_t M, size_t N, typename T > class Matrix;
 template< size_t M, typename T > class vector;
-template < typename T > class quaternion;
+template < typename T > class Quaternion;
 template< typename T > class AABB;
 template< typename T > class Frustum;
 template< typename T > class FrustumCuller;
@@ -70,8 +70,8 @@ typedef vector< 4, float > Vector4f; //!< A 4-component float vector
 typedef vector< 3, uint8_t > Vector3ub; //!< A 3-component byte vector
 typedef vector< 4, uint8_t > Vector4ub; //!< A 4-component byte vector
 
-typedef quaternion< float >  Quaternionf; //!< A float quaternion
-typedef quaternion< double > Quaterniond; //!< A doubl quaternion
+typedef Quaternion< float >  Quaternionf; //!< A float quaternion
+typedef Quaternion< double > Quaterniond; //!< A doubl quaternion
 
 typedef Frustum< float >  Frustumf; //!< A float frustum
 typedef Frustum< double > Frustumd; //!< A double frustum

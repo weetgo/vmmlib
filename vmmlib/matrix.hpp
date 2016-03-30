@@ -83,7 +83,7 @@ public:
      * a translation vector.
      */
     template< size_t S >
-    Matrix( const quaternion< T >& rotation, const vector< S, T >& translation,
+    Matrix( const Quaternion< T >& rotation, const vector< S, T >& translation,
             typename enable_if< R == S+1 && C == S+1 && S == 3 >::type* = 0 );
 
     /**
@@ -328,9 +328,8 @@ public:
 
 namespace vmml
 {
-/*
- *   free functions
- */
+/** @name Free matrix functions */
+//@{
 template< typename T >
 inline T computeDeterminant( const Matrix< 1, 1, T >& matrix_ )
 {
@@ -512,6 +511,7 @@ Matrix< C, R, T > transpose( const Matrix< R, C, T >& matrix_ )
             transposed( col, row ) = matrix_( row, col );
     return transposed;
 }
+//@}
 
 template< size_t R, size_t C, typename T >
 Matrix< R, C, T >::Matrix()
@@ -544,11 +544,11 @@ Matrix< R, C, T >::Matrix( const Matrix< P, Q, T >& source_ )
 }
 
 template< size_t R, size_t C, typename T > template< size_t O >
-Matrix< R, C, T >::Matrix( const quaternion< T >& rotation,
+Matrix< R, C, T >::Matrix( const Quaternion< T >& rotation,
                            const vector< O, T >& translation,
                    typename enable_if< R == O+1 && C == O+1 && O == 3 >::type* )
 {
-    rotation.get_rotation_matrix( *this );
+    (*this) = rotation.getRotationMatrix();
     setTranslation( translation );
     (*this)( 3, 0 ) = 0;
     (*this)( 3, 1 ) = 0;
