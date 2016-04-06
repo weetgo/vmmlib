@@ -241,12 +241,12 @@ public:
                             typename enable_if< M == 3, TT >::type* = 0 );
 
     /** @return the sub vector of the given length at the given offset. */
-    template< size_t N, size_t O = 0 >
+    template< size_t N, size_t O >
     vector< N, T > get_sub_vector( typename enable_if< M >= N+O >::type* = 0 )
         const;
 
     /** Set the sub vector of the given length at the given offset. */
-    template< size_t N, size_t O = 0 >
+    template< size_t N, size_t O >
     void set_sub_vector( const vector< N, T >& sub,
                          typename enable_if< M >= N+O >::type* = 0 );
 

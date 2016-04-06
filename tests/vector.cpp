@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE(tbd1)
 BOOST_AUTO_TEST_CASE(subVector)
 {
     vector< 4, float > v4( 3.0, 2.0, 1.0, 1.0 );
-    vector< 3, float > v3 = v4.get_sub_vector< 3 >();
+    vector< 3, float > v3 = v4.get_sub_vector< 3, 0 >();
     BOOST_CHECK(v3.x() == v4.x() && v3.y() == v4.y());
     v3.normalize();
 
