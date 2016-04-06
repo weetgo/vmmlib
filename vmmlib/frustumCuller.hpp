@@ -161,7 +161,7 @@ template < typename T >
 inline void
 FrustumCuller< T >::_normalizePlane( vector< 4, T >& plane ) const
 {
-    const vec3& v3 = plane.template get_sub_vector< 3 >();
+    const vec3& v3 = plane.template get_sub_vector< 3, 0 >();
     const T len_i = 1.0 / v3.length();
     plane.x() *= len_i;
     plane.y() *= len_i;
