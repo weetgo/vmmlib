@@ -46,6 +46,7 @@
 #include <string>
 #include <cstring>
 #include <fstream>   // file I/O
+#include <stdexcept>
 
 namespace vmml
 {
