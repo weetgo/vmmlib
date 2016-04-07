@@ -2,11 +2,10 @@
 
 # git master
 
+# Release 1.10 (07-04-2016)
+
 * [49](https://github.com/Eyescale/vmmlib/pull/49):
   Add lookAt support for 4x4 matrices
-
-# Release 1.10 (08-03-2016)
-
 * Improved API and test coverage
 
 # Release 1.9 (02-11-2015)
