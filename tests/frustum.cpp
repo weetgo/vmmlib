@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE( convert )
 BOOST_AUTO_TEST_CASE( base )
 {
     const vmml::Frustumf frustum( -1.f, 1., -1.f, 1., 1.f, 100.f );
-    const vmml::matrix< 4, 4, float > mvp = frustum.computePerspectiveMatrix();
+    const vmml::Matrix< 4, 4, float > mvp = frustum.computePerspectiveMatrix();
 
     const vmml::FrustumCullerf fc( mvp );
     _testCull( fc );

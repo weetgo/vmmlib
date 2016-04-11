@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014, Visualization and Multimedia Lab,
+ * Copyright (c) 2006-2016, Visualization and Multimedia Lab,
  *                          University of Zurich <http://vmml.ifi.uzh.ch>,
  *                          Eyescale Software GmbH,
  *                          Blue Brain Project, EPFL
@@ -29,70 +29,68 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-//Copyright (c) 2010 Daniel Pfeifer
 
-#ifndef __VMML_MATRIX_TRAITS_HPP__
-#define __VMML_MATRIX_TRAITS_HPP__
+/* @author Jafet Villafranca
+ *
+ * Implements low pass filtering on a templated data type, which needs to
+ * implement multiplication by a scalar float for smoothing
+ */
 
-#include <vmmlib/matrix.hpp>
-#include <boost/la/matrix_traits.hpp>
+#ifndef __VMML__LOWPASS_FILTER__HPP__
+#define __VMML__LOWPASS_FILTER__HPP__
 
-namespace boost
+#include <deque>
+
+namespace vmml
 {
-namespace la
+template< size_t M, typename T > class LowpassFilter
 {
+public:
+    /** Construct a new lowpass filter with the given smoothing. */
+    LowpassFilter( const float F ) : _smoothFactor( F ) {}
+    ~LowpassFilter() {}
 
-template<size_t M, size_t N, typename T>
-struct matrix_traits<vmml::matrix<M, N, T> >
-{
-	typedef vmml::matrix<M, N, T> matrix_type;
+    /** @return The current filtered output value */
+    const T& get() const { return _value; }
 
-	static const int rows = M;
-	static const int cols = N;
+    /** Access the filtered value. */
+    const T* operator->() const { return &_value; }
 
-	typedef T scalar_type;
+    /** Access the filtered value. */
+    const T& operator*() const { return _value; }
 
-	template<int Row, int Col>
-	static scalar_type r(const matrix_type& m)
-	{
-		BOOST_STATIC_ASSERT(Row >= 0);
-		BOOST_STATIC_ASSERT(Row < rows);
-		BOOST_STATIC_ASSERT(Col >= 0);
-		BOOST_STATIC_ASSERT(Col < cols);
-		return m.at(Col, Row);
-	}
+    /** Add a value to the data set and return the filtered output */
+    const T& add( const T& value );
 
-	template<int Row, int Col>
-	static scalar_type& w(matrix_type& m)
-	{
-		BOOST_STATIC_ASSERT(Row >= 0);
-		BOOST_STATIC_ASSERT(Row < rows);
-		BOOST_STATIC_ASSERT(Col >= 0);
-		BOOST_STATIC_ASSERT(Col < cols);
-		return m.at(Col, Row);
-	}
-
-	static scalar_type ir(int row, int col, const matrix_type& m)
-	{
-		BOOST_ASSERT(row >= 0);
-		BOOST_ASSERT(row < rows);
-		BOOST_ASSERT(col >= 0);
-		BOOST_ASSERT(col < cols);
-		return m.at(col, row);
-	}
-
-	static scalar_type& iw(int row, int col, matrix_type& m)
-	{
-		BOOST_ASSERT(row >= 0);
-		BOOST_ASSERT(row < rows);
-		BOOST_ASSERT(col >= 0);
-		BOOST_ASSERT(col < cols);
-		return m.at(col, row);
-	}
+private:
+    std::deque< T > _data;
+    float _smoothFactor;
+    T _value;
 };
 
-} // namespace la
-} // namespace boost
 
-#endif /* VMML_MATRIX_TRAITS_HPP */
+template< size_t M, typename T >
+const T& LowpassFilter< M, T >::add( const T& value )
+{
+    _data.push_front( value );
 
+    while( _data.size() > M )
+        _data.pop_back();
+
+    // update
+    typename std::deque< T >::const_iterator i = _data.begin();
+    _value = *i;
+    double weight = _smoothFactor;
+
+    for( ++i ; i != _data.end(); ++i )
+    {
+        _value = _value * (1 - weight) + (*i) * weight;
+        weight *= _smoothFactor;
+    }
+
+    return _value;
+}
+
+} // namespace vmml
+
+#endif

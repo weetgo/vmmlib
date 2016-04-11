@@ -27,7 +27,6 @@
  */
 
 #include <vmmlib/matrix.hpp>
-#include <vmmlib/math.hpp>
 #include <vmmlib/types.hpp>
 
 #define BOOST_TEST_MODULE matrix
@@ -76,3 +75,10 @@ BOOST_AUTO_TEST_CASE( lookat )
     BOOST_CHECK_EQUAL( lookAt, newLookAt );
     BOOST_CHECK_EQUAL( up, newUp );
 }
+
+// Verify code by instantiating some templates:
+template class vmml::Matrix< 1, 1, float >;
+template class vmml::Matrix< 2, 2, double >;
+template class vmml::Matrix< 3, 3, short >;
+template class vmml::Matrix< 3, 4, int >;
+template class vmml::Matrix< 4, 4, long >;

@@ -70,7 +70,7 @@ public:
      * @param radius Sphere radius
      * @param distance Intersection distance
      *
-     * @return The distance from the sphere center on intersection, or a
+     * @return The distance from the ray origin to the intersection, or a
      *         negative value if there is no intersection.
      */
     T test( const vec4& sphere ) const;
