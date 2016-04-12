@@ -32,6 +32,10 @@
 #define BOOST_TEST_MODULE vector
 #include <boost/test/unit_test.hpp>
 
+#ifndef M_PI
+#  define M_PI 3.14159265358979323846264338327
+#endif
+
 using namespace vmml;
 
 BOOST_AUTO_TEST_CASE(base)

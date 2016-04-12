@@ -114,8 +114,14 @@ public:
     Matrix< R, P, T > operator*( const Matrix< C, P, T >& other ) const;
 
     /** Multiply two square matrices */
+#ifdef COMMON_USE_CXX03
     template< size_t O, size_t P >
     typename enable_if< R == C && O == P && R == O >::type*
+#else
+    template< size_t O, size_t P,
+              typename = typename enable_if< R == C && O == P && R == O >::type >
+    Matrix< R, C, T >&
+#endif
     operator*=( const Matrix< O, P, T >& right );
 
     /** Element-wise addition of two matrices */
@@ -662,13 +668,22 @@ Matrix< R, P, T > Matrix< R, C, T >::operator*( const Matrix< C, P, T >& other )
     return result.multiply( *this, other );
 }
 
+#ifdef COMMON_USE_CXX03
 template< size_t R, size_t C, typename T > template< size_t O, size_t P >
 typename enable_if< R == C && O == P && R == O >::type*
+#else
+template< size_t R, size_t C, typename T > template< size_t O, size_t P, typename >
+Matrix< R, C, T >&
+#endif
 Matrix< R, C, T >::operator*=( const Matrix< O, P, T >& right )
 {
     Matrix< R, C, T > copy( *this );
     multiply( copy, right );
+#ifdef COMMON_USE_CXX03
     return 0;
+#else
+    return *this;
+#endif
 }
 
 template< size_t R, size_t C, typename T >
