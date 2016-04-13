@@ -114,7 +114,7 @@ public:
     Matrix< R, P, T > operator*( const Matrix< C, P, T >& other ) const;
 
     /** Multiply two square matrices */
-#ifdef COMMON_USE_CXX03
+#ifdef VMMLIB_USE_CXX03
     template< size_t O, size_t P >
     typename enable_if< R == C && O == P && R == O >::type*
 #else
@@ -668,7 +668,7 @@ Matrix< R, P, T > Matrix< R, C, T >::operator*( const Matrix< C, P, T >& other )
     return result.multiply( *this, other );
 }
 
-#ifdef COMMON_USE_CXX03
+#ifdef VMMLIB_USE_CXX03
 template< size_t R, size_t C, typename T > template< size_t O, size_t P >
 typename enable_if< R == C && O == P && R == O >::type*
 #else
@@ -679,7 +679,7 @@ Matrix< R, C, T >::operator*=( const Matrix< O, P, T >& right )
 {
     Matrix< R, C, T > copy( *this );
     multiply( copy, right );
-#ifdef COMMON_USE_CXX03
+#ifdef VMMLIB_USE_CXX03
     return 0;
 #else
     return *this;
