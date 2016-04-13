@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE( lookat )
 }
 
 // Verify code by instantiating some templates:
-template class vmml::Matrix< 1, 1, float >;
+template class vmml::Matrix< 2, 2, float >;
 template class vmml::Matrix< 2, 2, double >;
 template class vmml::Matrix< 3, 3, short >;
 template class vmml::Matrix< 3, 4, int >;
