@@ -1,13 +1,10 @@
 # Copyright (c) 2011-2016 Daniel Pfeifer <daniel@pfeifer-mail.de>
 #                         Stefan.Eilemann@epfl.ch
 
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
-project(vmmlib)
+cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+project(vmmlib VERSION 1.10.0)
 
-set(VERSION_MAJOR 1)
-set(VERSION_MINOR 10)
-set(VERSION_PATCH 0)
-set(VERSION_ABI 6)
+set(vmmlib_VERSION_ABI 6)
 
 set(COMMON_PROJECT_DOMAIN ch.eyescale)
 set(VMMLIB_DESCRIPTION "Templatized C++ vector and matrix math library")
@@ -20,8 +17,8 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
 include(GitExternal)
 include(Common)
 
-common_package(Boost COMPONENTS unit_test_framework)
-common_package_post()
+common_find_package(Boost COMPONENTS unit_test_framework)
+common_find_package_post()
 
 add_subdirectory(vmmlib)
 add_subdirectory(tests)

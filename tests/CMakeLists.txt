@@ -5,7 +5,7 @@ if(NOT Boost_FOUND)
   return()
 endif()
 
-set(TEST_LIBRARIES ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+set(TEST_LIBRARIES vmmlib ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 include(CommonCTest)
 
 include(InstallFiles)

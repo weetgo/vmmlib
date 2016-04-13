@@ -71,7 +71,7 @@ public:
     vector( const vector< M-1, T >& vector_, T last_ );
 #endif
 
-    vector( const T* values );
+    explicit vector( const T* values );
 
 #ifdef __OSG_MATH
     template< typename OSGVEC3 >
