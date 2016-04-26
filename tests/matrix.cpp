@@ -32,7 +32,7 @@
 #define BOOST_TEST_MODULE matrix
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(base)
+BOOST_AUTO_TEST_CASE( base )
 {
     vmml::Matrix4d matrix;
     for( size_t i = 0; i < 16; ++i )
@@ -74,6 +74,15 @@ BOOST_AUTO_TEST_CASE( lookat )
     BOOST_CHECK_EQUAL( eye, newEye );
     BOOST_CHECK_EQUAL( lookAt, newLookAt );
     BOOST_CHECK_EQUAL( up, newUp );
+}
+
+BOOST_AUTO_TEST_CASE( nonInvertible )
+{
+    vmml::Matrix2f matrix;
+    matrix( 0, 0 ) = 0.f;
+    matrix( 1, 1 ) = 0.f;
+    const vmml::Matrix2f inverse = matrix.inverse();
+    BOOST_CHECK( std::isnan( inverse( 0, 1 )));
 }
 
 // Verify code by instantiating some templates:

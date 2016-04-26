@@ -352,18 +352,18 @@ inline T computeDeterminant( const Matrix< 4, 4, T >& m )
 }
 
 template< typename T >
-Matrix< 1, 1, T > compute_inverse( const Matrix< 1, 1, T >& m_ )
+Matrix< 1, 1, T > computeInverse( const Matrix< 1, 1, T >& m_ )
 {
     return Matrix< 1, 1, T >( std::vector< T >( T(1) / m_( 0, 0 ), 1 ));
 }
 
 template< typename T >
-Matrix< 2, 2, T > compute_inverse( const Matrix< 2, 2, T >& m_ )
+Matrix< 2, 2, T > computeInverse( const Matrix< 2, 2, T >& m_ )
 {
     const T det = computeDeterminant( m_ );
     if( std::abs( det ) < std::numeric_limits< T >::epsilon( ))
         return Matrix< 2, 2, T >(
-            std::vector< T >( std::numeric_limits< T >::quiet_NaN(), 4 ));
+            std::vector< T >( 4, std::numeric_limits< T >::quiet_NaN( )));
 
     Matrix< 2, 2, T > inverse;
     m_.getAdjugate( inverse );
@@ -376,7 +376,7 @@ Matrix< 2, 2, T > compute_inverse( const Matrix< 2, 2, T >& m_ )
 }
 
 template< typename T >
-Matrix< 3, 3, T > compute_inverse( const Matrix< 3, 3, T >& m_ )
+Matrix< 3, 3, T > computeInverse( const Matrix< 3, 3, T >& m_ )
 {
     // Invert a 3x3 using cofactors.  This is about 8 times faster than
     // the Numerical Recipes code which uses Gaussian elimination.
@@ -414,7 +414,7 @@ Matrix< 3, 3, T > compute_inverse( const Matrix< 3, 3, T >& m_ )
 }
 
 template< typename T >
-Matrix< 4, 4, T > compute_inverse( const Matrix< 4, 4, T >& m_ )
+Matrix< 4, 4, T > computeInverse( const Matrix< 4, 4, T >& m_ )
 {
     const T* array = m_.array;
 
@@ -462,7 +462,7 @@ Matrix< 4, 4, T > compute_inverse( const Matrix< 4, 4, T >& m_ )
 
    if( std::abs( determinant ) <= std::numeric_limits< T >::epsilon( ))
        return Matrix< 4, 4, T >(
-           std::vector< T >( std::numeric_limits< T >::quiet_NaN(), 16 ));
+           std::vector< T >( 16, std::numeric_limits< T >::quiet_NaN( )));
 
    /* division: 16 multiplications, 1 division */
    const T detinv = T( 1 ) / determinant;
@@ -472,7 +472,7 @@ Matrix< 4, 4, T > compute_inverse( const Matrix< 4, 4, T >& m_ )
 }
 
 template< size_t R, size_t C, typename T >
-Matrix< R, C, T > compute_inverse( const Matrix< R, C, T >& )
+Matrix< R, C, T > computeInverse( const Matrix< R, C, T >& )
 {
     throw std::runtime_error( "Can't compute inverse of this matrix" );
 }
@@ -813,7 +813,7 @@ Matrix< R, C, T >::setSubMatrix( const Matrix< O, P, T >& sub_matrix,
 template< size_t R, size_t C, typename T >
 Matrix< R, C, T > Matrix< R, C, T >::inverse() const
 {
-    return compute_inverse( *this );
+    return computeInverse( *this );
 }
 
 template< size_t R, size_t C, typename T > template< size_t O, size_t P >
