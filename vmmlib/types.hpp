@@ -47,6 +47,8 @@ template< typename T > class FrustumCuller;
 template< typename T > class Quaternion;
 template< typename T > class Ray;
 
+typedef Matrix< 2, 2, double > Matrix2d; //!< A 2x2 double matrix
+typedef Matrix< 2, 2, float >  Matrix2f; //!< A 2x2 float matrix
 typedef Matrix< 3, 3, double > Matrix3d; //!< A 3x3 double matrix
 typedef Matrix< 3, 3, float >  Matrix3f; //!< A 3x3 float matrix
 typedef Matrix< 4, 4, double > Matrix4d; //!< A 4x4 double matrix
