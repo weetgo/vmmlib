@@ -2,8 +2,7 @@
 #                         Stefan.Eilemann@epfl.ch
 
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-project(vmmlib VERSION 1.10.0)
-
+project(vmmlib VERSION 1.11.0)
 set(vmmlib_VERSION_ABI 6)
 
 set(COMMON_PROJECT_DOMAIN ch.eyescale)
