@@ -3,7 +3,7 @@
 # git master
 
 * [57](https://github.com/Eyescale/vmmlib/pull/57):
-  Fix handling of non-invertible 2x2 and 4x4 matrices
+  Fix handling of non-invertible 2x2, 3x3 and 4x4 matrices
 * [50](https://github.com/Eyescale/vmmlib/pull/50):
   Improved matrix, quaternion and lowpass filter API
 * [49](https://github.com/Eyescale/vmmlib/pull/49):

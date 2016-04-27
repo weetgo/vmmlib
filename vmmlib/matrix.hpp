@@ -397,7 +397,7 @@ Matrix< 3, 3, T > computeInverse( const Matrix< 3, 3, T >& m_ )
 
     if ( std::abs( determinant ) <= std::numeric_limits< T >::epsilon( ))
         return Matrix< 3, 3, T >(
-            std::vector< T >( std::numeric_limits< T >::quiet_NaN(), 9 ));
+            std::vector< T >( 9, std::numeric_limits< T >::quiet_NaN( )));
 
     const T detinv = static_cast< T >( 1.0 ) / determinant;
 
