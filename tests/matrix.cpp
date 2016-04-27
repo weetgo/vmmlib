@@ -78,15 +78,32 @@ BOOST_AUTO_TEST_CASE( lookat )
 
 BOOST_AUTO_TEST_CASE( nonInvertible )
 {
-    vmml::Matrix2f matrix;
-    matrix( 0, 0 ) = 0.f;
-    matrix( 1, 1 ) = 0.f;
-    const vmml::Matrix2f inverse = matrix.inverse();
-    BOOST_CHECK( std::isnan( inverse( 0, 1 )));
+    vmml::Matrix2f m2;
+    m2( 0, 0 ) = 0.f;
+    m2( 1, 1 ) = 0.f;
+    const vmml::Matrix2f i2 = m2.inverse();
+    BOOST_CHECK( std::isnan( i2( 0, 1 )));
+
+    vmml::Matrix3f m3;
+    m3( 0, 0 ) = 0.f;
+    m3( 1, 1 ) = 0.f;
+    m3( 2, 2 ) = 0.f;
+    const vmml::Matrix3f i3 = m3.inverse();
+    BOOST_CHECK( std::isnan( i3( 0, 1 )));
+
+    vmml::Matrix4f m4;
+    m4( 0, 0 ) = 0.f;
+    m4( 1, 1 ) = 0.f;
+    m4( 2, 2 ) = 0.f;
+    m4( 3, 3 ) = 0.f;
+    const vmml::Matrix4f i4 = m4.inverse();
+    BOOST_CHECK( std::isnan( i4( 0, 1 )));
 }
 
 // Verify code by instantiating some templates:
 template class vmml::Matrix< 2, 2, float >;
+template class vmml::Matrix< 3, 3, float >;
+template class vmml::Matrix< 4, 4, float >;
 template class vmml::Matrix< 2, 2, double >;
 template class vmml::Matrix< 3, 3, short >;
 template class vmml::Matrix< 3, 4, int >;
