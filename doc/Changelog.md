@@ -2,6 +2,8 @@
 
 # git master
 
+# Release 1.11 (30-06-2016)
+
 * [57](https://github.com/Eyescale/vmmlib/pull/57):
   Fix handling of non-invertible 2x2, 3x3 and 4x4 matrices
 * [50](https://github.com/Eyescale/vmmlib/pull/50):

@@ -1,9 +1,9 @@
-# Copyright (c) 2011-2016 Daniel Pfeifer <daniel@pfeifer-mail.de>
-#                         Stefan.Eilemann@epfl.ch
+# Copyright (c) 2011-2016 Daniel Pfeifer   daniel@pfeifer-mail.de
+#                         Steafan Eilemann Stefan.Eilemann@epfl.ch
 
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 project(vmmlib VERSION 1.11.0)
-set(vmmlib_VERSION_ABI 6)
+set(vmmlib_VERSION_ABI 7)
 
 set(COMMON_PROJECT_DOMAIN ch.eyescale)
 set(VMMLIB_DESCRIPTION "Templatized C++ vector and matrix math library")
