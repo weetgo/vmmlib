@@ -460,10 +460,6 @@ Matrix< 4, 4, T > computeInverse( const Matrix< 4, 4, T >& m_ )
    const T determinant = array[0] * inv.array[0] + array[4] * inv.array[1] +
                          array[8] * inv.array[2] + array[12] * inv.array[3];
 
-   if( std::abs( determinant ) <= std::numeric_limits< T >::epsilon( ))
-       return Matrix< 4, 4, T >(
-           std::vector< T >( 16, std::numeric_limits< T >::quiet_NaN( )));
-
    /* division: 16 multiplications, 1 division */
    const T detinv = T( 1 ) / determinant;
    for( size_t i = 0; i != 16; ++i )
