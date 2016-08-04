@@ -100,6 +100,20 @@ BOOST_AUTO_TEST_CASE( nonInvertible )
     BOOST_CHECK( std::isnan( i4( 0, 1 )));
 }
 
+BOOST_AUTO_TEST_CASE( invertible )
+{
+    vmml::Matrix4f m4;
+    m4( 0, 0 ) = 0.0007f;
+    m4( 1, 1 ) = 0.0007f;
+    m4( 2, 2 ) = 0.0007f;
+    m4( 3, 3 ) = 1.0f;
+    m4( 0, 3 ) = -0.0242f;
+    m4( 1, 3 ) = -0.5168f;
+    m4( 2, 3 ) = -0.0332f;
+    const vmml::Matrix4f i4 = m4.inverse();
+    BOOST_CHECK( !std::isnan( i4( 0, 1 )));
+}
+
 // Verify code by instantiating some templates:
 template class vmml::Matrix< 2, 2, float >;
 template class vmml::Matrix< 3, 3, float >;
