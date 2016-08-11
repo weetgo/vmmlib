@@ -2,6 +2,10 @@
 
 # git master
 
+* [62](https://github.com/Eyescale/vmmlib/pull/62)
+  Removed a check in Matrix::computeInverse() that was discarding
+  valid matrices
+
 # Release 1.11 (30-06-2016)
 
 * [57](https://github.com/Eyescale/vmmlib/pull/57):
