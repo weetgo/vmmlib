@@ -1096,9 +1096,9 @@ void Matrix< R, C, T >::getLookAt( vector< S, T >& eye, vector< S, T >& lookAt,
     const Matrix< 4, 4, T >& inv = inverse();
     const Matrix< 3, 3, T > rotation( transpose( Matrix< 3, 3, T >( *this )));
 
-    eye = inv * vector< 3, T >::ZERO;
-    up = rotation * vector< 3, T >::UP;
-    lookAt = rotation * vector< 3, T >::FORWARD;
+    eye = vector< S, T >( inv * vector< 4, T >::zero( ));
+    up = rotation * vector< 3, T >::up();
+    lookAt = rotation * vector< 3, T >::forward();
     lookAt.normalize();
     lookAt = eye + lookAt;
 }

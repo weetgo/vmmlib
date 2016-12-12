@@ -59,3 +59,10 @@ BOOST_AUTO_TEST_CASE(axisAlignedBoundingBox_base)
     box1.merge( box2 );
     BOOST_CHECK_EQUAL( box1, box2 );
 }
+
+BOOST_AUTO_TEST_CASE(unitbox)
+{
+    const vmml::AABBf unitBox = vmml::AABBf::makeUnitBox();
+    BOOST_CHECK_EQUAL( unitBox.getCenter(), vmml::Vector3f( 0.5f ));
+    BOOST_CHECK_EQUAL( unitBox.getSize(), vmml::Vector3f( 1.0f ));
+}

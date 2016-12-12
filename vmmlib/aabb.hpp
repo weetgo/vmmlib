@@ -102,7 +102,7 @@ public:
     void computeNearFar( const vector< 4, T >& plane, vector< 3, T >& nearPoint,
                          vector< 3, T >& farPoint ) const;
 
-    /** @return a bouding box of size one with the minimum point at zero. */
+    /** @return a bounding box of size one with the minimum point at zero. */
     static AABB< T > makeUnitBox();
 
 private:
@@ -255,7 +255,8 @@ template< typename T > inline bool AABB< T >::isEmpty() const
 }
 
 template< typename T > inline void
-AABB< T >::computeNearFar( const vector< 4, T >& plane, vector< 3, T >& nearPoint,
+AABB< T >::computeNearFar( const vector< 4, T >& plane,
+                           vector< 3, T >& nearPoint,
                            vector< 3, T >& farPoint ) const
 {
     for( size_t i = 0; i < 3; ++i )
@@ -275,7 +276,7 @@ AABB< T >::computeNearFar( const vector< 4, T >& plane, vector< 3, T >& nearPoin
 
 template< typename T > AABB< T > AABB< T >::makeUnitBox()
 {
-    return AABB( vector< 3, T >::ZERO, vector< 3, T >::ONE );
+    return AABB( vector< 3, T >(), vector< 3, T >( 1 ));
 }
 
 }

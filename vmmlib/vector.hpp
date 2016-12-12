@@ -68,7 +68,9 @@ public:
 
 #ifndef SWIG
     // initializes the first M-1 values from vector_, the last from last_
-    vector( const vector< M-1, T >& vector_, T last_ );
+    template< typename TT >
+    vector( const vector< M-1, TT >& vector_, T last_,
+            typename enable_if< M == 4, TT >::type* = nullptr );
 #endif
 
     explicit vector( const T* values );
@@ -76,19 +78,19 @@ public:
 #ifdef __OSG_MATH
     template< typename OSGVEC3 >
     explicit vector( const OSGVEC3& from,
-                     typename enable_if< M == 3, OSGVEC3 >::type* = 0 );
+                     typename enable_if< M == 3, OSGVEC3 >::type* = nullptr );
 #endif
 
     // vec< M > with homogeneous coordinates <-> vec< M-1 > conversion ctor
     // to-homogenous-coordinates ctor
-    template< size_t N >
-    vector( const vector< N, T >& source_,
-            typename enable_if< N == M - 1 >::type* = 0 );
+    template< typename TT >
+    vector( const vector< 3, TT >& source_,
+            typename enable_if< M == 4, TT >::type* = nullptr );
 
     // from-homogenous-coordinates vector
-    template< size_t N >
-    vector( const vector< N, T >& source_,
-            typename enable_if< N == M + 1 >::type* = 0  );
+    template< typename TT >
+    vector( const vector< 4, TT >& source_,
+            typename enable_if< M == 3, TT >::type* = nullptr  );
 
     template< typename U > vector( const vector< M, U >& source_ );
 
@@ -102,15 +104,9 @@ public:
     inline const_reverse_iterator rbegin() const;
     inline const_reverse_iterator rend() const;
 
-#  ifndef VMMLIB_NO_CONVERSION_OPERATORS
     // conversion operators
     inline operator T*();
     inline operator const T*() const;
-#  else
-    inline T& operator[]( size_t index );
-    inline const T& operator[]( size_t index ) const;
-#  endif
-
     // accessors
     inline T& operator()( size_t index );
     inline const T& operator()( size_t index ) const;
@@ -145,25 +141,12 @@ public:
     bool operator<( const vector& other ) const;
 
     // remember kids: c_arrays are dangerous and evil!
-    vector& operator=( const T* c_array );
     T operator=( T filler );
 
     vector& operator=( const vector& other );
 
     // returns void to avoid 'silent' loss of precision when chaining
     template< typename U > void operator=( const vector< M, U >& other );
-
-    // to-homogenous-coordinates assignment operator
-    // non-chainable because of sfinae
-    template< size_t N >
-    typename enable_if< N == M - 1 >::type*
-        operator=( const vector< N, T >& source_ );
-
-    // from-homogenous-coordinates assignment operator
-    // non-chainable because of sfinae
-    template< size_t N >
-    typename enable_if< N == M + 1 >::type*
-        operator=( const vector< N, T >& source_ );
 
     vector operator*( const vector& other ) const;
     vector operator/( const vector& other ) const;
@@ -190,9 +173,6 @@ public:
     const vector& negate();
 
     void set( T a ); // sets all components to a;
-#ifndef SWIG
-    void set( const vector< M-1, T >& v, T a );
-#endif
     template< size_t N >
     void set( const vector< N, T >& v );
 
@@ -209,7 +189,7 @@ public:
     // vector<> cross( const vector<>, const vector<> )
     template< typename TT >
     vector< M, T >& cross( const vector< M, TT >& b,
-                           typename enable_if< M == 3, TT >::type* = 0 );
+                           typename enable_if< M == 3, TT >::type* = nullptr );
 
     // compute the dot product of two vectors
     // note: there's also a free function:
@@ -238,38 +218,37 @@ public:
 
     template< typename TT >
     vector< 3, T >& rotate( T theta, vector< M, TT > axis,
-                            typename enable_if< M == 3, TT >::type* = 0 );
+                            typename enable_if< M == 3, TT >::type* = nullptr );
 
     /** @return the sub vector of the given length at the given offset. */
-    template< size_t N, size_t O >
-    vector< N, T > get_sub_vector( typename enable_if< M >= N+O >::type* = 0 )
-        const;
+    template< size_t N, size_t O > vector< N, T >
+    get_sub_vector( typename enable_if< M >= N+O >::type* = nullptr ) const;
 
     /** Set the sub vector of the given length at the given offset. */
     template< size_t N, size_t O >
     void set_sub_vector( const vector< N, T >& sub,
-                         typename enable_if< M >= N+O >::type* = 0 );
+                         typename enable_if< M >= N+O >::type* = nullptr );
 
     // sphere functions - sphere layout: center xyz, radius w
     template< typename TT >
     inline vector< 3, T > project_point_onto_sphere(
         const vector< 3, TT >& point,
-        typename enable_if< M == 4, TT >::type* = 0 ) const;
+        typename enable_if< M == 4, TT >::type* = nullptr ) const;
 
     // returns a negative distance if the point lies in the sphere
     template< typename TT >
     inline T distance_to_sphere( const vector< 3, TT >& point,
-        typename enable_if< M == 4, TT >::type* = 0 ) const;
+        typename enable_if< M == 4, TT >::type* = nullptr ) const;
 
     // plane functions - plane layout; normal xyz, distance w
     template< typename TT >
     inline T distance_to_plane( const vector< 3, TT >& point,
-        typename enable_if< M == 4, TT >::type* = 0 ) const;
+        typename enable_if< M == 4, TT >::type* = nullptr ) const;
 
     template< typename TT >
     inline vector< 3, T > project_point_onto_plane(
         const vector< 3, TT >& point,
-        typename enable_if< M == 4, TT >::type* = 0 ) const;
+        typename enable_if< M == 4, TT >::type* = nullptr ) const;
 
     // returns the index of the minimal resp. maximal value in the vector
     size_t      find_min_index() const;
@@ -324,57 +303,22 @@ public:
         return os;
     }
 
+    /** @name Convenience presets for 3 and 4 component vectors */
+    //@{
+    static vector< M, T > zero();
+    static vector< M, T > forward();
+    static vector< M, T > backward();
+    static vector< M, T > up();
+    static vector< M, T > down();
+    static vector< M, T > left();
+    static vector< M, T > right();
+    static vector< M, T > unitX();
+    static vector< M, T > unitY();
+    static vector< M, T > unitZ();
+    //@}
+
     T array[ M ];    //!< storage
-
-#ifndef SWIG
-    // Vector3 defaults
-    static const vector FORWARD;
-    static const vector BACKWARD;
-    static const vector UP;
-    static const vector DOWN;
-    static const vector LEFT;
-    static const vector RIGHT;
-
-    static const vector ONE;
-    static const vector ZERO;
-
-    // Unit vectors
-    static const vector UNIT_X;
-    static const vector UNIT_Y;
-    static const vector UNIT_Z;
-#endif
-
-}; // class vector
-
-//
-// typedefs and statics
-//
-#ifndef SWIG
-template< size_t M, typename T >
-const vector< M, T > vector< M, T >::FORWARD( 0, 0, -1 );
-template< size_t M, typename T >
-const vector< M, T > vector< M, T >::BACKWARD( 0, 0, 1 );
-template< size_t M, typename T >
-const vector< M, T > vector< M, T >::UP( 0, 1, 0 );
-template< size_t M, typename T >
-const vector< M, T > vector< M, T >::DOWN( 0, -1, 0 );
-template< size_t M, typename T >
-const vector< M, T > vector< M, T >::LEFT( -1, 0, 0 );
-template< size_t M, typename T >
-const vector< M, T > vector< M, T >::RIGHT( 1, 0, 0 );
-template< size_t M, typename T >
-
-const vector< M, T > vector< M, T >::ONE( static_cast< T >( 1 ));
-template< size_t M, typename T >
-const vector< M, T > vector< M, T >::ZERO( static_cast< T >( 0 ));
-template< size_t M, typename T >
-
-const vector< M, T > vector< M, T >::UNIT_X( 1, 0, 0 );
-template< size_t M, typename T >
-const vector< M, T > vector< M, T >::UNIT_Y( 0, 1, 0 );
-template< size_t M, typename T >
-const vector< M, T > vector< M, T >::UNIT_Z( 0, 0, 1 );
-#endif
+};
 
 //
 //  some free functions for convenience
@@ -498,39 +442,36 @@ vector< M, T >::vector( const OSGVEC3& from,
 #endif
 
 #ifndef SWIG
-template< size_t M, typename T >
+template< size_t M, typename T > template< typename TT >
 // initializes the first M-1 values from vector_, the last from last_
-vector< M, T >::vector( const vector< M-1, T >& vector_, T last_ )
+vector< M, T >::vector( const vector< M-1, TT >& vector_, T last_,
+                        typename enable_if< M == 4, TT >::type* )
 {
-    typename vector< M-1, T >::const_iterator
-        it = vector_.begin(), it_end = vector_.end();
-
-    iterator my_it = begin();
-
-    for( ; it != it_end; ++it, ++my_it )
-    {
-        (*my_it) = *it;
-    }
-    (*my_it) = last_;
+    array[0] = vector_.array[0];
+    array[1] = vector_.array[1];
+    array[2] = vector_.array[2];
+    array[3] = last_;
 }
 #endif
 
 // to-homogenous-coordinates ctor
-template< size_t M, typename T >
-template< size_t N >
-vector< M, T >::vector( const vector< N, T >& source_,
-                        typename enable_if< N == M - 1 >::type* )
+template< size_t M, typename T > template< typename TT >
+vector< M, T >::vector( const vector< 3, TT >& source_,
+                        typename enable_if< M == 4, TT >::type* )
 {
-    (*this) = source_;
+    std::copy( source_.begin(), source_.end(), begin() );
+    at( M - 1 ) = static_cast< T >( 1.0 );
 }
 
 // from-homogenous-coordinates ctor
-template< size_t M, typename T >
-template< size_t N >
-vector< M, T >::vector( const vector< N, T >& source_,
-                        typename enable_if< N == M + 1 >::type* )
+template< size_t M, typename T > template< typename TT >
+vector< M, T >::vector( const vector< 4, TT >& source_,
+                        typename enable_if< M == 3, TT >::type* )
 {
-    (*this) = source_;
+    const T w_reci = static_cast< T >( 1.0 ) / source_( M );
+    iterator it = begin(), it_end = end();
+    for( size_t index = 0; it != it_end; ++it, ++index )
+        *it = source_( index ) * w_reci;
 }
 
 template< size_t M, typename T >
@@ -540,20 +481,78 @@ vector< M, T >::vector( const vector< M, U >& source_ )
     (*this) = source_;
 }
 
+namespace
+{
+template< size_t M, typename T >
+vector< M, T > _createVector( const T x, const T y, const T z,
+                              typename enable_if< M == 3 >::type* = nullptr )
+{
+    return vector< M, T >( x, y, z );
+}
+
+template< size_t M, typename T >
+vector< M, T > _createVector( const T x, const T y, const T z,
+                              typename enable_if< M == 4 >::type* = nullptr )
+{
+    return vector< M, T >( x, y, z, 1 );
+}
+}
+
+template< size_t M, typename T > vector< M, T > vector< M, T >::zero()
+{
+    return _createVector< M, T >( 0, 0, 0 );
+}
+
+template< size_t M, typename T > vector< M, T > vector< M, T >::forward()
+{
+    return _createVector< M, T >( 0, 0, -1 );
+}
+
+template< size_t M, typename T > vector< M, T > vector< M, T >::backward()
+{
+    return _createVector< M, T >( 0, 0, 1 );
+}
+
+template< size_t M, typename T > vector< M, T > vector< M, T >::up()
+{
+    return _createVector< M, T >( 0, 1, 0 );
+}
+
+template< size_t M, typename T > vector< M, T > vector< M, T >::down()
+{
+    return _createVector< M, T >( 0, -1, 0 );
+}
+
+template< size_t M, typename T > vector< M, T > vector< M, T >::left()
+{
+    return _createVector< M, T >( -1, 0, 0 );
+}
+
+template< size_t M, typename T > vector< M, T > vector< M, T >::right()
+{
+    return _createVector< M, T >( 1, 0, 0 );
+}
+
+template< size_t M, typename T > vector< M, T > vector< M, T >::unitX()
+{
+    return _createVector< M, T >( 1, 0, 0 );
+}
+
+template< size_t M, typename T > vector< M, T > vector< M, T >::unitY()
+{
+    return _createVector< M, T >( 0, 1, 0 );
+}
+
+template< size_t M, typename T > vector< M, T > vector< M, T >::unitZ()
+{
+    return _createVector< M, T >( 0, 0, 1 );
+}
+
 template< size_t M, typename T > void vector< M, T >::set( T _a )
 {
     for( iterator it = begin(), it_end = end(); it != it_end; ++it )
         *it = _a;
 }
-
-#ifndef SWIG
-template< size_t M, typename T >
-void vector< M, T >::set( const vector< M-1, T >& v, T _a )
-{
-    memcpy( array, v.array, sizeof( T ) * (M-1) );
-    at( M-1 ) = _a;
-}
-#endif
 
 template< size_t M, typename T > template< size_t N >
 void vector< M, T >::set( const vector< N, T >& v )
@@ -619,8 +618,6 @@ vector< M, T >::at( size_t index ) const
     return array[ index ];
 }
 
-#ifndef VMMLIB_NO_CONVERSION_OPERATORS
-
 template< size_t M, typename T >
 vector< M, T >::operator T*()
 {
@@ -632,39 +629,6 @@ vector< M, T >::operator const T*() const
 {
     return array;
 }
-#else
-
-template< size_t M, typename T >
-T&
-vector< M, T >::operator[]( size_t index )
-{
-    return at( index );
-}
-
-template< size_t M, typename T >
-const T&
-vector< M, T >::operator[]( size_t index ) const
-{
-    return at( index );
-}
-
-#endif
-
-#if 0
-template< size_t M, typename T >
-inline T&
-vector< M, T >::operator[]( size_t index )
-{
-    return at( index );
-}
-
-template< size_t M, typename T >
-inline const T&
-vector< M, T >::operator[]( size_t index ) const
-{
-    return at( index );
-}
-#endif
 
 template< size_t M, typename T >
 vector< M, T >
@@ -1122,37 +1086,6 @@ vector< M, T >::operator<( const vector< M, T >& other ) const
         if (other.at( index ) < at( index )) return false;
     }
     return false;
-}
-
-// to-homogenous-coordinates assignment operator
-// non-chainable because of sfinae
-template< size_t M, typename T > template< size_t N >
-typename enable_if< N == M - 1 >::type*
-vector< M, T >::operator=( const vector< N, T >& source_ )
-{
-    std::copy( source_.begin(), source_.end(), begin() );
-    at( M - 1 ) = static_cast< T >( 1.0 );
-    return 0;
-}
-
-// from-homogenous-coordinates assignment operator
-// non-chainable because of sfinae
-template< size_t M, typename T > template< size_t N >
-typename enable_if< N == M + 1 >::type*
-vector< M, T >::operator=( const vector< N, T >& source_ )
-{
-    const T w_reci = static_cast< T >( 1.0 ) / source_( M );
-    iterator it = begin(), it_end = end();
-    for( size_t index = 0; it != it_end; ++it, ++index )
-        *it = source_( index ) * w_reci;
-    return 0;
-}
-
-template< size_t M, typename T >
-vector< M, T >& vector< M, T >::operator=( const T* c_array )
-{
-    iter_set( c_array, c_array + M );
-    return *this;
 }
 
 template< size_t M, typename T >

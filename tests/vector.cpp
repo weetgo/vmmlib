@@ -63,168 +63,118 @@ BOOST_AUTO_TEST_CASE(base)
 
 BOOST_AUTO_TEST_CASE(plus)
 {
-    vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
+    double datad[] = { 4, 3, 2, 1 };
 
     // tests operator+ function
-    vector< 4, double > v_other;
-    vector< 4, double > v_result;
+    vector< 4, double > v( data );
+    vector< 4, double > v_other( datad );
+    vector< 4, double > v_result = v + v_other;
 
-    v = data;
-
-    double datad[] = { 4, 3, 2, 1 };
-    v_other = datad;
-
-    v_result = v + v_other;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(v_result.at( index ) == 5);
-    }
 
     v_result = v;
     v_result += v_other;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(v_result.at( index ) == 5);
-    }
 
-    v = data;
+    v = vector< 4, double >( data );
     v_result = v + 2.;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(v_result.at( index ) == index + 3);
-    }
 
     v_result = v;
     v_result += 2;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(v_result.at( index ) == index + 3);
-    }
 }
 
 BOOST_AUTO_TEST_CASE(minus)
 {
-    vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
+    double datad[] = { 1, 2, 3, 4 };
 
     // tests operator- function
-    vector< 4, double > v_other;
+    vector< 4, double > v( data );
+    vector< 4, double > v_other( datad );
     vector< 4, double > v_result;
-    v = data;
-
-    double datad[] = { 1, 2, 3, 4 };
-    v_other = datad;
 
     v_result = v - v_other;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(v_result.at( index ) == 0);
-    }
 
     v_result = v;
     v_result -= v_other;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(v_result.at( index ) == 0);
-    }
-
 
     v_result = v - 1.0;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(v_result.at( index ) == index);
-    }
 
     v_result = v;
     v_result -= 1.0;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(v_result.at( index ) == index);
-    }
 }
 
 BOOST_AUTO_TEST_CASE(times)
 {
-    vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
+    double datad[] = { 24, 12, 8, 6 };
 
     // tests operator* function
-    vector< 4, double > v_other;
+    vector< 4, double > v( data );
+    vector< 4, double > v_other( datad );
     vector< 4, double > v_result;
-
-    v = data;
-
-    double datad[] = { 24, 12, 8, 6 };
-    v_other = datad;
 
     v_result = v * v_other;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(v_result.at( index ) == 24);
-    }
 
     v_result = v;
     v_result *= v_other;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(v_result.at( index ) == 24);
-    }
 
     v_result = v * 2.0;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(v_result.at( index ) == v.at( index ) * 2.0);
-    }
 
     v_result = v;
     v_result *= 2.0;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(v_result.at( index ) == v.at( index ) * 2.0);
-    }
 }
 
 BOOST_AUTO_TEST_CASE(divide)
 {
-    vector< 4, double > v;
     double data[] = { 1, 2, 3, 4 };
+    double datad[] = { 2, 4, 6, 8 };
 
     // tests operator/ function
-    vector< 4, double > v_other;
+    vector< 4, double > v( data );
+    vector< 4, double > v_other( datad );
     vector< 4, double > v_result;
-
-    v = data;
-
-    double datad[] = { 2, 4, 6, 8 };
-    v_other = datad;
 
     v_result = v / v_other;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(( v_result.at( index ) - 0.5 ) < 1e-12);
-    }
 
     v_result = v;
     v_result /= v_other;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(( v_result.at( index ) - 0.5 ) < 1e-12);
-    }
-
 
     v_result = v / 1.5;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(( v_result.at( index ) - ( v.at( index ) / 1.5 ) ) < 1e-12);
-    }
 
     v_result = v;
     v_result /= 1.5;
     for( size_t index = 0; index < 4; ++index )
-    {
         BOOST_CHECK(( v_result.at( index ) - ( v.at( index ) / 1.5 ) ) < 1e-12);
-    }
 }
 
 BOOST_AUTO_TEST_CASE(vec_norm)
@@ -233,8 +183,7 @@ BOOST_AUTO_TEST_CASE(vec_norm)
     double data[] = { 1, 2, 3, 4 };
 
     // tests norm / normSquared (length/lengthSquared) computation
-    vector< 4, double > vec;
-    vec = data;
+    vector< 4, double > vec( data );
 
     double normSquared = vec.squared_length();
     BOOST_CHECK(normSquared == 1 * 1 + 2 * 2 + 3 * 3 + 4 * 4);
@@ -243,40 +192,37 @@ BOOST_AUTO_TEST_CASE(vec_norm)
     BOOST_CHECK(sqrt( normSquared ) == norm);
 
     // tests normalize
-    vec = data;
+    vec = vector< 4, double >( data );
     vec.normalize();
     BOOST_CHECK_CLOSE( vec.length(), 1.0, 0.0000001 );
-
 
     // constructor tests
     double vData[] = { 1, 2, 3, 4 };
     vector< 4, double > v4( 1, 2, 3, 4 );
 
-    vector< 2, double > v2C;
-    v2C = vData;
+    vector< 2, double > v2C( vData );
     vector< 2, double > v2( 1, 2 );
 
     BOOST_CHECK(v2 == v2C );
 
-    vector< 3, double > v3C;
-    v3C = vData;
+    vector< 3, double > v3C( vData );
     vector< 3, double > v3( 1, 2, 3 );
 
     BOOST_CHECK(v3 == v3C );
 
-    vector< 4, double > v4C;
-    v4C = vData;
+    vector< 4, double > v4C( vData );
 
     BOOST_CHECK(v4 == v4C);
 
     double vData2[] = { 23, 23, 23, 23 };
-    v4C = vData2;
+    v4C = vector< 4, double >( vData2 );
 
     vector< 4, double > v4_( 23 );
     BOOST_CHECK(v4_ == v4C);
 
-    v3 = vData;
-    v4C = vData;
+    v3 = vector< 3, double >( vData );
+    v4C = vector< 4, double >( vData );
+
     vector< 4, double > v4from3_1( v3, vData[ 3 ] );
     BOOST_CHECK(v4from3_1 == v4C);
 
@@ -299,16 +245,15 @@ BOOST_AUTO_TEST_CASE(vec_norm)
     BOOST_CHECK(nhtest == nonh );
 
     // set tests
-    vec.set( 2, 3, 4, 5 );
-    vector< 4, double > vecCorrect;
     double vCData[] = { 2, 3, 4, 5 };
-    vecCorrect = vCData;
+    vec.set( 2, 3, 4, 5 );
+    vector< 4, double > vecCorrect( vCData );
     BOOST_CHECK(vec == vecCorrect);
 
     vec.set( 2 );
 
     double vCData2[] = { 2, 2, 2, 2 };
-    vecCorrect = vCData2;
+    vecCorrect = vector< 4, double >( vCData2 );
     BOOST_CHECK( vec == vecCorrect );
 
     vector< 3, double > v1( 2, 3, 4 );
@@ -443,12 +388,12 @@ BOOST_AUTO_TEST_CASE(l2norm)
 
 BOOST_AUTO_TEST_CASE(rotateVec)
 {
-    vmml::Vector3f vector = vmml::Vector3f::FORWARD;
-    vector.rotate( float( M_PI ), vmml::Vector3f::UP );
-    BOOST_CHECK_MESSAGE( vector.equals( vmml::Vector3f::BACKWARD ), vector );
+    vmml::Vector3f vector = vmml::Vector3f::forward();
+    vector.rotate( float( M_PI ), vmml::Vector3f::up( ));
+    BOOST_CHECK_MESSAGE( vector.equals( vmml::Vector3f::backward( )), vector );
     BOOST_CHECK_MESSAGE( vmml::rotate( vector, float( M_PI ),
-                                       vmml::Vector3f::LEFT ).equals(
-                                           vmml::Vector3f::FORWARD ),
+                                       vmml::Vector3f::left( )).equals(
+                                           vmml::Vector3f::forward( )),
                          vmml::rotate( vector, float( M_PI ),
-                                       vmml::Vector3f::LEFT ));
+                                       vmml::Vector3f::left( )));
 }
