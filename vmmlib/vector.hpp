@@ -284,23 +284,12 @@ public:
 
     size_t nnz() const;
 
-    // test each component of the vector for isnan and isinf
-    //  inline bool is_valid() const; -> moved to class validator
-
     friend std::ostream& operator<< ( std::ostream& os, const vector& vector_ )
     {
-        const std::ios::fmtflags flags = os.flags();
-        const int                prec  = os.precision();
-
-        os.setf( std::ios::right, std::ios::adjustfield );
-        os.precision( 5 );
         os << "[ ";
         for( size_t index = 0; index < M; ++index )
-            os << std::setw(10) << vector_.at( index ) << " ";
-        os << "]";
-        os.precision( prec );
-        os.setf( flags );
-        return os;
+            os << vector_.at( index ) << " ";
+        return os << "]";
     }
 
     /** @name Convenience presets for 3 and 4 component vectors */

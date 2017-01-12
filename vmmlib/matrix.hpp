@@ -277,13 +277,11 @@ public:
         os.setf( std::ios::right, std::ios::adjustfield );
         os.precision( 7 );
 
-        for( size_t rowIndex = 0; rowIndex< R; ++rowIndex )
+        for( size_t rowIndex = 0; rowIndex < R; ++rowIndex )
         {
             os << "|";
             for( size_t colIndex = 0; colIndex < C; ++colIndex )
-            {
                 os << std::setw(10) << matrix( rowIndex, colIndex ) << " ";
-            }
             os << "|" << std::endl;
         }
         os.precision( prec );
