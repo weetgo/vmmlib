@@ -65,6 +65,12 @@ public:
     /** @return true if the given sphere is within this bounding box. */
     bool isIn( const vector< 4, T >& sphere ) const;
 
+    /**
+     * @return true if this bounding box is in front of the given plane
+     *         ([normal.x|y|z, d] notation).
+     */
+    bool isInFront( const vector< 4, T >& plane ) const;
+
     /** @return the minimum corner point */
     const vector< 3, T >& getMin() const;
 
@@ -170,6 +176,18 @@ bool AABB< T >::isIn( const vector< 4, T >& sphere ) const
     if ( sv.x() < _min.x() || sv.y() < _min.y() || sv.z() < _min.z() )
         return false;
     return true;
+}
+
+template< typename T > inline
+bool AABB< T >::isInFront( const vector< 4, T >& plane ) const
+{
+    const auto& extent = getSize() * 0.5f;
+    const float d = plane.dot( getCenter() );
+    const float n = extent.x() * std::abs( plane.x( )) +
+                    extent.y() * std::abs( plane.y( )) +
+                    extent.z() * std::abs( plane.z( ));
+
+    return !( d - n >= 0 || d + n > 0 );
 }
 
 template< typename T > inline const vector< 3, T >& AABB< T >::getMin() const

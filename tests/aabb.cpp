@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2014-2016, Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2014-2017, Stefan.Eilemann@epfl.ch
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -65,4 +65,16 @@ BOOST_AUTO_TEST_CASE(unitbox)
     const vmml::AABBf unitBox = vmml::AABBf::makeUnitBox();
     BOOST_CHECK_EQUAL( unitBox.getCenter(), vmml::Vector3f( 0.5f ));
     BOOST_CHECK_EQUAL( unitBox.getSize(), vmml::Vector3f( 1.0f ));
+}
+
+BOOST_AUTO_TEST_CASE(isInFront)
+{
+    const vmml::AABBf unitBox = vmml::AABBf::makeUnitBox();
+    BOOST_CHECK(  unitBox.isInFront( {  1, 0, 0, -1.0 }));
+    BOOST_CHECK(  unitBox.isInFront( {  1, 0, 0, -1.1 }));
+    BOOST_CHECK( !unitBox.isInFront( {  1, 0, 0, -0.9 }));
+
+    BOOST_CHECK(  unitBox.isInFront( { -1, 0, 0,  0.0 }));
+    BOOST_CHECK(  unitBox.isInFront( { -1, 0, 0, -0.1 }));
+    BOOST_CHECK( !unitBox.isInFront( { -1, 0, 0,  0.1 }));
 }
