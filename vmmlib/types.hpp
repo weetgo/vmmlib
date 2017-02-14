@@ -55,6 +55,7 @@ typedef Matrix< 4, 4, double > Matrix4d; //!< A 4x4 double matrix
 typedef Matrix< 4, 4, float >  Matrix4f; //!< A 4x4 float matrix
 
 typedef vector< 2, float > Vector2f; //!< A 2-component float vector
+typedef vector< 2, double > Vector2d; //!< A 2-component double vector
 typedef vector< 2, int > Vector2i; //!< A 2-component int vector
 typedef vector< 2, unsigned > Vector2ui; //!< A 2-component unsigned int vector
 typedef vector< 3, double > Vector3d; //!< A 3-component double vector
